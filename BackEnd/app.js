@@ -3,9 +3,10 @@ const app = express();
 const cors = require("cors")
 app.use(cors())
 app.use(express.json());
-
+const protectedRoute = require("./loginRouter")
 const authRouter = require("./router");
 app.use("/api", authRouter);
+app.use("/api", protectedRoute)
 
 app.get("/", (req, res) => {
   res.send("Backend is running!");

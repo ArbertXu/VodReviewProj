@@ -10,8 +10,8 @@ function Home() {
             <p>Welcome to our vod review platform</p>
             <button onClick={() => navigate("/login/user")}>Login as User</button>
             <button onClick={() => navigate("/login/coach")}>Login as Coach</button>
+            <button onClick={() => navigate("registration/user")}>Register</button>
         </div>
-           
     )
 }
 export default Home;

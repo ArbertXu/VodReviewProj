@@ -1,64 +1,50 @@
 import React, { useState } from "react";
+import { auth, signInWithEmailAndPassword } from "../firebaseAuth";
+
 function UserLogin() {
-    const[formData, setFormData] = useState({
-        username: "",
-        email: "",
-        password: "",
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState(null);
+
+  const handleChange = (e) => {
+    setFormData({...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      const token = await userCredential.user.getIdToken();
+
+    const response = await fetch("http://localhost:3000/api/protected", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
-    const handleChange = (e) => {
-        setFormData({...formData, [e.target.name]: e.target.value})
-    }
-    const handleSubmit = async (e) => {
-        console.log("Submitting form:", formData);
-        e.preventDefault();
-        try {
-            const response = await fetch("http://localhost:3000/api/register", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    ...formData,
-                    role: "user",
-                }),
-            })
-            const data = await response.json();
-            if (response.ok) {
-                alert("User registered successfully!")
-            } else {
-                alert ("ERROR: " + data.error)
-            }
-        } catch (err) {
-            alert ("Request failed: " + err.message)
-        }
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Login successful and protected route accessed!");
+      console.log("Protected response:", data);
+    } else {
+      alert("Failed to access protected route: " + data.error);
     }
 
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-    return (
-        <div>
-            <h2>
-                User Login
-            </h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    name="username"
-                    placeholder="username"
-                    onChange={handleChange}
-                    />
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="email"
-                    onChange={handleChange}
-                    />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="password"
-                    onChange={handleChange}
-                    />
-                <button type="submit">Register as User</button>
-            </form>
-        </div>
-    )
+  return (
+    <form onSubmit={handleSubmit}>
+      <input name="email" type="email" placeholder="Email" onChange={handleChange} required />
+      <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
+      <button type="submit">Login</button>
+      {error && <p style={{color:"red"}}>{error}</p>}
+    </form>
+  );
 }
-export default UserLogin
+
+export default UserLogin;
