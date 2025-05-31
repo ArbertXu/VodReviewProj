@@ -1,17 +1,20 @@
 import React from "react";
-import "../assets/styles/Home.css"
 import { useNavigate } from "react-router-dom";
-
+import Dashboard from "../assets/components/dashboard";
 function Home() {
     const navigate = useNavigate();
     return (
-        <div>
-            <h1>Hello!</h1>
-            <p>Welcome to our vod review platform</p>
-            <button onClick={() => navigate("/login/user")}>Login as User</button>
-            <button onClick={() => navigate("/login/coach")}>Login as Coach</button>
-            <button onClick={() => navigate("registration/user")}>Register</button>
+        <>
+        <Dashboard/>
+          <div className="bg-gray-500 h-px w-full max-w-7xl mx-auto my-2" />
+        <div className="min-h-screen flex">
+            <div className="text-left space-y-6 text-balance">
+                <p className="text-5xl text-white">VOD Reviews Simplified</p>
+                <p className="text-lg text-white">Rank up or help others with our all-encompassing Vod review platform. Sign up to become a coach and review other's VODS or become a user yourself and get your VODS</p>
+            </div>
         </div>
-    )
+        </>
+    );
 }
+
 export default Home;
