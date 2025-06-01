@@ -7,3 +7,6 @@ body {
 /* @tailwind base;
 @tailwind components;
 @tailwind utilities; */
+form {
+  @apply bg-gray-700;
+}

@@ -32,31 +32,44 @@ function CoachLogin() {
     }
 
     return (
-        <div>
-            <h2>
-                User Login
-            </h2>
-            <form onSubmit={handleSubmit}>
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="w-full max-w-md p-4">
+            <h2 className="text-white text-center text-2xl mb-4">Coach Login</h2>
+            <form
+                onSubmit={handleSubmit}
+                className="card shadow-xl p-6 space-y-4 text-white"
+            >
                 <input
-                    type="name"
-                    name="username"
-                    placeholder="username"
-                    onChange={handleChange}
-                    />
+                type="email"
+                name="email"
+                placeholder="Email"
+                className="input input-bordered w-full"
+                onChange={handleChange}
+                />
                 <input
-                    type="email"
-                    name="email"
-                    placeholder="email"
-                    onChange={handleChange}
-                    />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="password"
-                    onChange={handleChange}
-                    />
-                <button type="Submit">Login as Coach</button>
+                type="password"
+                name="password"
+                placeholder="Password"
+                className="input input-bordered w-full"
+                onChange={handleChange}
+                />
+                <button type="submit" className="btn bg-blue-500 hover:bg-blue-700 w-full">
+                Login
+                </button>
+                <div className="flex justify-evenly text-sm pt-2">
+                    <span className="text-gray-400">Don't have an account?</span>
+                    <div className="flex">
+                    <button
+                        type="button"
+                        onClick={() => navigate("/registration/user")}
+                        className="btn btn-outline btn-sm hover:bg-gray-500"
+                    >
+                        Sign Up
+                    </button>
+                    </div>
+                </div>
             </form>
+            </div>
         </div>
     )
 }
