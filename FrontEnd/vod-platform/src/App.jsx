@@ -5,6 +5,7 @@ import Home from "./pages/Home"
 import UserLogin from './pages/userLogin'
 import CoachLogin from './pages/coachLogin'
 import UserRegistration from './pages/UserRegistration'
+import VODPage from './pages/VODpage'
 function App() {
   const [count, setCount] = useState(0)
 
@@ -16,6 +17,7 @@ function App() {
           <Route path='/login/user' element={<UserLogin />}/>
           <Route path='/login/coach' element={<CoachLogin />}/>
           <Route path='registration/user' element={<UserRegistration/>}/>
+          <Route path='/VOD' element={<VODPage/>}/>
         </Routes>
       </div>
     </Router>
