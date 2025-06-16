@@ -10,10 +10,12 @@ app.use(bodyParser.json());
 const protectedRoute = require("./Routers/loginRouter")
 const authRouter = require("./Routers/router");
 const vodRouter = require("./Routers/VODdatabasRouter");
+const getVidRouter = require("./Routers/getVODS");
 app.use("/api", authRouter);
 app.use("/api", protectedRoute)
 app.use("/api", vodRouter)
 app.use("/api", s3UploadRoutes);
+app.use("/api", getVidRouter);
 app.get("/", (req, res) => {
   res.send("Backend is running!");
 });

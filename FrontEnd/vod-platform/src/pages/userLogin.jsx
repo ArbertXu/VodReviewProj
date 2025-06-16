@@ -5,7 +5,7 @@ function UserLogin() {
     const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
-
+  
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value });
   };
@@ -29,6 +29,9 @@ function UserLogin() {
     if (response.ok) {
       alert("Login successful and protected route accessed!");
       console.log("Protected response:", data);
+      const uid = userCredential.user.uid;
+      sessionStorage.setItem("user_id", uid);
+
     } else {
       alert("Failed to access protected route: " + data.error);
     }
@@ -60,7 +63,7 @@ function UserLogin() {
                 className="input input-bordered w-full"
                 onChange={handleChange}
                 />
-                <button type="submit" className="btn bg-blue-500 hover:bg-blue-700 w-full">
+                <button type="submit" onClick={() => navigate("/")} className="btn bg-blue-500 hover:bg-blue-700 w-full">
                 Login
                 </button>
                 <div className="flex justify-evenly text-sm pt-2">

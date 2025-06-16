@@ -17,7 +17,7 @@ function App() {
           <Route path='/login/user' element={<UserLogin />}/>
           <Route path='/login/coach' element={<CoachLogin />}/>
           <Route path='registration/user' element={<UserRegistration/>}/>
-          <Route path='/VOD' element={<VODPage/>}/>
+          <Route path='/VODS' element={<VODPage/>}/>
         </Routes>
       </div>
     </Router>
