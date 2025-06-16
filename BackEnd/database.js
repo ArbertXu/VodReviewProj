@@ -1,5 +1,6 @@
 
 const { Pool } = require('pg');
+const { connectionString } = require('pg/lib/defaults.js');
 require('dotenv').config();
 
 const pool = new Pool({
@@ -9,4 +10,12 @@ const pool = new Pool({
   }
 });
 
-module.exports = pool;
+const poolComment = new Pool({
+    connectionString: process.env.COMMENT_DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
+})
+
+
+module.exports = pool, poolComment;

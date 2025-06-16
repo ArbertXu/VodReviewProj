@@ -36,6 +36,7 @@ router.post("/upload", upload.single("video"), async (req, res) => {
     });
 
     const s3Key = `vods/${outputFilename}`;
+    console.log("S3 KEY TO UPLOAD:", s3Key);
     const fileStream = fs.createReadStream(outputPath);
     const s3Res = await s3
       .upload({
@@ -45,6 +46,7 @@ router.post("/upload", upload.single("video"), async (req, res) => {
         ContentType: "video/mp4",
       })
       .promise();
+
     const signedURL = await s3.getSignedUrlPromise("getObject", {
         Bucket: process.env.S3_BUCKET_NAME,
         Key: s3Key,
