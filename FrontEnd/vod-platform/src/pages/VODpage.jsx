@@ -4,8 +4,8 @@ export default function VodTest() {
   const [vods, setVods] = useState([]);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-
   const [userID, setUserID] = useState(null);
+  const [vodComments, setvodComments] = useState({});
 
   useEffect(() => {
     const storedUserID = sessionStorage.getItem("user_id");
@@ -14,7 +14,7 @@ export default function VodTest() {
     }
   }, []);
     useEffect(() => {
-
+        if (!userID) return;
         fetch(`http://localhost:3000/api/vods/user/${userID}`)
         .then((res) => res.json())
         .then((data) => {
@@ -23,6 +23,28 @@ export default function VodTest() {
         })
         .catch((err) => console.error("Error fetching VODs:", err));
     }, [userID]);
+    useEffect(() => {
+  console.log("VOD URLs:", vods.map(v => v.url));
+}, [vods]);
+  useEffect(() => {
+    if (!userID) return;
+    const fetchComments = async () => {
+        const allComments = {}
+        for (const vod of vods) {
+            try {
+                const res = await fetch(`http://localhost:3000/api/vod_comments/${vod.vod_id}`)
+                const data = await res.json()
+                allComments[vod.vod_id] = data
+            } catch (err) {
+                console.error(`Error fetching comments for VOD ${vod.vod_id}`, err)
+            }
+        }
+        setvodComments(allComments)
+    }
+    if (vods.length > 0)
+ {
+    fetchComments()
+ }  }, [vods])
 
 
   const handleFileChange = (e) => {
@@ -68,6 +90,7 @@ export default function VodTest() {
     } finally {
       setUploading(false);
     }
+    
   };
 
 
@@ -91,8 +114,44 @@ export default function VodTest() {
         </button>
       </form>
       <h1 className="text-2xl p-5 text-white">Your VODS</h1>
-                  <video controls width="600" src="https://vod-storage-proj.s3.us-east-2.amazonaws.com/vods/compressed-abdde354-fb50-41a2-962d-7c46b52a19da.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAYLKIYXEZSAWWUR3J%2F20250616%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20250616T021708Z&X-Amz-Expires=216000&X-Amz-Signature=6073e90398df090c2e2b698ef5b30f627ed4598a8a080f901a3d7f3151f86b08&X-Amz-SignedHeaders=host" />
+                  {vods.map((vod) => (
+  <div key={vod.vod_id} className="mb-8">
+    <video controls width="600">
+      <source src={vod.url} type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+    <div className="text-white">
+            <h3 className="font-bold mb-2">Comments:</h3>
+            {vodComments[vod.vod_id]?.length > 0 ? (
+              <ul className="space-y-2">
+                {vodComments[vod.vod_id].map((c, index) => (
+                  <li key={index} className="bg-gray-800 p-2 rounded">
+                    <strong>{formatTimestamp(c.timestamp_seconds)}</strong>: {c.comments}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="italic">No comments yet</p>
+            )}
+          </div>
+  </div>
+))}
+
 
     </div>
   );
+}
+function formatTimestamp(seconds) {
+  if (isNaN(seconds)) return "0:00";
+
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  const paddedMins = hrs > 0 ? String(mins).padStart(2, "0") : mins;
+  const paddedSecs = String(secs).padStart(2, "0");
+
+  return hrs > 0
+    ? `${hrs}:${paddedMins}:${paddedSecs}`
+    : `${paddedMins}:${paddedSecs}`;
 }
