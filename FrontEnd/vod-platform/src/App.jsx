@@ -7,7 +7,6 @@ import CoachLogin from './pages/coachLogin'
 import UserRegistration from './pages/UserRegistration'
 import VODPage from './pages/VODpage'
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <Router>

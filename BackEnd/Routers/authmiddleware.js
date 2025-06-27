@@ -1,4 +1,4 @@
-const admin = require("../firebase.js")
+const {admin, setCoachClaim} = require("../firebase.js")
 
 const verifyFirebaseToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -18,5 +18,7 @@ const verifyFirebaseToken = async (req, res, next) => {
     res.status(401).json({ error: "Unauthorized: Invalid token" });
   }
 };
+
+
 
 module.exports = verifyFirebaseToken;

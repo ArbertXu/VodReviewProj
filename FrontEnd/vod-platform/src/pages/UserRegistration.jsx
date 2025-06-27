@@ -6,6 +6,7 @@ function UserRegistration() {
         username: "",
         email: "",
         password: "",
+        role: "user",
     });
     const handleChange = (e) => {
         setFormData({...formData, [e.target.name]: e.target.value})
@@ -17,14 +18,12 @@ function UserRegistration() {
             const response = await fetch("http://localhost:3000/api/register", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    ...formData,
-                    role: "user",
-                }),
+                body: JSON.stringify(formData),
             })
             const data = await response.json();
             if (response.ok) {
                 alert("User registered successfully!")
+                navigate("/")
             } else {
                 alert ("ERROR: " + data.error)
             }
@@ -63,6 +62,20 @@ function UserRegistration() {
                 className="input input-bordered w-full"
                 onChange={handleChange}
                 />
+                <input
+                type="checkbox"
+                id="coachCheckbox"
+                checked={formData.role == "coach"}
+                className="flex-row"
+                onChange={(e) => setFormData({
+                    ...formData, 
+                    role: e.target.checked ? "coach" : "user",
+                })
+                }
+                />
+                <label htmlFor="coachCheckbox" className="p-1">
+                    Register as Coach
+                </label>
                 <button type="submit" className="btn bg-blue-500 hover:bg-blue-700 w-full">
                 Register
                 </button>

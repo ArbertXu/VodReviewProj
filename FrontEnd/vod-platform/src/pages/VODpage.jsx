@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import VideoPlayer from "../assets/components/VideoPlayer";
+import Dashboard from "../assets/components/dashboard";
 export default function VodTest() {
   const [vods, setVods] = useState([]);
   const [file, setFile] = useState(null);
@@ -96,7 +97,9 @@ export default function VodTest() {
 
 
   return (
+    
     <div className="p-4">
+        <Dashboard/>
       <h2 className="text-xl font-bold mb-4">Upload a New VOD</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4 flex justify-center">
@@ -116,8 +119,8 @@ export default function VodTest() {
       <h1 className="text-2xl p-5 text-white">Your VODS</h1>
                   {vods.map((vod) => (
   <div key={vod.vod_id} className="mb-8">
-    <video controls width="600">
-      <source src={vod.url} type="video/mp4" />
+    <video controls width="600" className="inline">
+      <source src={vod.url} type="video/mp4"/>
       Your browser does not support the video tag.
     </video>
     <div className="text-white">

@@ -1,15 +1,18 @@
 const express = require("express")
-const admin = require("../firebase.js")
+const {admin, setCoachClaim} = require("../firebase.js")
 const router = express.Router()
 
 router.post("/register", async (req, res) => {
     console.log(req.body)
-    const {username, email, password, role} = req.body
+    const {email, password, role} = req.body
     try {
         const user = await admin.auth().createUser({
             email,
             password,
-        })
+        })  
+        if (role == "coach") {
+            await setCoachClaim(user.uid)
+        }
         // await admin.auth().setCustomUserClaims(user.uid, {role})
         // await admin.firestore().collection("users").doc(user.uid).set({
         //     username,
