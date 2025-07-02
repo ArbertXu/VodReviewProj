@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import VideoPlayer from "../assets/components/VideoPlayer";
 import Dashboard from "../assets/components/dashboard";
+import CommentSection from "../assets/components/commentForm";
 export default function VodTest() {
   const [vods, setVods] = useState([]);
   const [file, setFile] = useState(null);
@@ -93,6 +94,7 @@ export default function VodTest() {
     }
     
   };
+  
 
 
 
@@ -119,42 +121,12 @@ export default function VodTest() {
       <h1 className="text-2xl p-5 text-white">Your VODS</h1>
                   {vods.map((vod) => (
   <div key={vod.vod_id} className="mb-8">
-    <video controls width="600" className="inline">
-      <source src={vod.url} type="video/mp4"/>
-      Your browser does not support the video tag.
-    </video>
-    <div className="text-white">
-            <h3 className="font-bold mb-2">Comments:</h3>
-            {vodComments[vod.vod_id]?.length > 0 ? (
-              <ul className="space-y-2">
-                {vodComments[vod.vod_id].map((c, index) => (
-                  <li key={index} className="bg-gray-800 p-2 rounded">
-                    <strong>{formatTimestamp(c.timestamp_seconds)}</strong>: {c.comments}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="italic">No comments yet</p>
-            )}
-          </div>
+
+    <CommentSection vod={vod}/>
   </div>
-))}
+    ))}
 
 
     </div>
   );
-}
-function formatTimestamp(seconds) {
-  if (isNaN(seconds)) return "0:00";
-
-  const hrs = Math.floor(seconds / 3600);
-  const mins = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-
-  const paddedMins = hrs > 0 ? String(mins).padStart(2, "0") : mins;
-  const paddedSecs = String(secs).padStart(2, "0");
-
-  return hrs > 0
-    ? `${hrs}:${paddedMins}:${paddedSecs}`
-    : `${paddedMins}:${paddedSecs}`;
 }
