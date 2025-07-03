@@ -4,30 +4,31 @@ const poolComment = require("../database");
 
 router.post("/vod_comments", async(req, res) => {
     const {vod_id, timestamp_seconds, comments, created_at} = req.body;
-    try {
-        const result = await poolComment.query(
-            `INSERT INTO vod_comments (vod_id, timestamp_seconds, comments, created_at)
-            VALUES ($1, $2, $3, $4)
-            RETURNING *`,
-            [vod_id, timestamp_seconds, comments, created_at]
-        );
-            res.status(201).json(result.rows[0]);
-    } catch (err) {
-        console.error("ERROR INSERTING VALUES", err);
-        res.status(500).json({error: "SERVICE ERORR"});
+    const {data, error} = await superbase
+    .from("vod_comments")
+    .insert([{vod_id, timestamp_seconds, comments, created_at}])
+    .select()
+    .single();
+
+    if(error) {
+        console.error("error uploading comment", error)
+        return res.status(500).json( {error: "SERVICE ERROR"});
     }
+    res.status(201).json(data);
 });
 
 router.get("/vod_comments/:vodID", async (req, res) => {
     const { vodID } = req.params;
-  try {
-    const result = await poolComment.query("SELECT * FROM vod_comments WHERE vod_id = $1 ORDER BY timestamp_seconds ASC", [vodID]);
-    res.json(result.rows);
-    console.log("Fetched COMMENTS:", result.rows);
-  } catch (err) {
-    console.error("ERROR",err);
-    res.status(500).send("Error retrieving COMMENTS dsfdnoasdf");
-  }
+    const {data, error} = await superbase
+    .from("vod_comments")
+    .select("*")
+    .eq("vod_id", vodID)
+    .order("timestamp_seconds", {ascending:true})
+    if (error) {
+        console.error("error getting comments", error)
+        return res.status(500).send("Error retrieving comments");
+    }
+    res.json(data);
 });
 
 module.exports = router

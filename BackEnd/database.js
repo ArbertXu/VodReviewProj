@@ -1,21 +1,9 @@
-
-const { Pool } = require('pg');
-const { connectionString } = require('pg/lib/defaults.js');
+const {createClient} = require('@supabase/supabase-js')
 require('dotenv').config();
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+const supabaseURL = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
-const poolComment = new Pool({
-    connectionString: process.env.COMMENT_DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
-    }
-})
+const supabase = createClient(supabaseURL, supabaseKey);
 
-
-module.exports = pool, poolComment;
+module.exports = supabase;
