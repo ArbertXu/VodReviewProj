@@ -15,7 +15,7 @@ router.get("/explore", async (req, res) => {
 
 router.get("/vods/user/:user_id", async(req, res) => {
   const { user_id } = req.params;
-  if (!user_id || user_id == "null") {
+  if (user_id == "null") {
     return res.status(400).json({error: "LOGIN"})
   }
   const { data, error } = await supabase
