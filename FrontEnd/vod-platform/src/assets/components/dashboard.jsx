@@ -1,10 +1,15 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { href } from 'react-router-dom'
+import { getAuth, signOut } from 'firebase/auth'
+import { useNavigate } from "react-router-dom";
+
 const navigation = [
   { name: 'My VODS', href: '/VODS', current: false },
-  { name: 'Login as User', href: '/login/user', current: false },
-  { name: 'Login as Coach', href: '/login/coach', current: false },
+  { name: 'Login', href: '/login/user', current: false },
+  // { name: 'Login as Coach', href: '/login/coach', current: false },
   { name: 'Register', href: '/registration/user', current: false },
+  {name: 'Explore', href: '/explore', current: false},
 ]
 
 function classNames(...classes) {
@@ -12,6 +17,18 @@ function classNames(...classes) {
 }
 
 export default function Dashboard() {
+  const navigate = useNavigate()
+  const auth = getAuth()
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      alert("You have logged out!");
+      sessionStorage.clear()
+      navigate("/")
+    } catch (err) {
+      console.error("Error signing out", err)
+    }
+  }
   return (
     <Disclosure as="nav" className="bg-gray-800">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -94,12 +111,9 @@ export default function Dashboard() {
                   </a>
                 </MenuItem>
                 <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-                  >
-                    Sign out
-                  </a>
+                  <button onClick={handleSignOut} className='block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden w-full'>
+                    Sign Out
+                  </button>
                 </MenuItem>
               </MenuItems>
             </Menu>

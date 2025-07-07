@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 
-export default function CommentSection({ vod }) {
+export default function CommentSection({ vod, canComment = true, isCoach = false }) {
   const [commentText, setCommentText] = useState("");
   const [currentTime, setCurrentTime] = useState(0);
   const [videoRef, setVideoRef] = useState(null);
   const [comments, setComments] = useState([]);
 
-
   useEffect(() => {
     fetchComments();
   }, [vod.vod_id]);
+
   const handleTimeUpdate = () => {
     if (videoRef) {
       setCurrentTime(videoRef.currentTime);
@@ -32,8 +32,8 @@ export default function CommentSection({ vod }) {
       });
 
       if (res.ok) {
-        alert("Comment submitted!");
         setCommentText("");
+        fetchComments();
       } else {
         const err = await res.json();
         alert("Error: " + err.message);
@@ -41,58 +41,67 @@ export default function CommentSection({ vod }) {
     } catch (error) {
       console.error("Failed to submit comment:", error);
     }
-    await fetchComments();
   };
-    const fetchComments = async () => {
-            try {
-                const res = await fetch(`http://localhost:3000/api/vod_comments/${vod.vod_id}`)
-                const data = await res.json()
-                setComments(data);
-            } catch (err) {
-                console.error(`Error fetching comments for VOD`, err)
-            }
-        }; 
-  
+
+  const fetchComments = async () => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/vod_comments/${vod.vod_id}`);
+      const data = await res.json();
+      setComments(data);
+    } catch (err) {
+      console.error(`Error fetching comments for VOD`, err);
+    }
+  };
 
   return (
-    <div className="text-white mt-4">
+    <div className="bg-[#1a1a1a] text-white rounded-md p-2 shadow-md w-90 flex flex-col text-xs">
       <video
         controls
-        width="600"
         onTimeUpdate={handleTimeUpdate}
         ref={(ref) => setVideoRef(ref)}
-        className="inline"
+        className="w-full rounded-md"
       >
-    <source src={vod.url} type="video/mp4" />
+        <source src={vod.url} type="video/mp4" />
       </video>
-        <div className="text-white">
-            <h3 className="font-bold mb-2">Comments:</h3>
-            {comments.length > 0 ? (
-              <ul className="space-y-2">
-                {comments.map((c, index) => (
-                  <li key={index} className="bg-gray-800 p-2 rounded">
-                    <strong>{formatTimestamp(c.timestamp_seconds)}</strong>: {c.comments}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="italic">No comments yet</p>
-            )}
+
+      <div className="mt-2 flex flex-col flex-grow">
+        <p className="font-semibold mb-1 text-xs">Comments:</p>
+        <div className="space-y-1 max-h-10 overflow-y-auto pr-1">
+          {comments.length > 0 ? (
+            comments.map((c, i) => (
+              <div key={i} className="bg-gray-800 p-1 rounded">
+                <p className="text-green-400">{formatTimestamp(c.timestamp_seconds)}</p>
+                <p>{c.comments}</p>
+              </div>
+            ))
+          ) : (
+            <p className="italic text-gray-400">No comments yet</p>
+          )}
+        </div>
+
+        {canComment && (
+          <div className="mt-2">
+            <p className="italic text-gray-400 mb-1">At: {formatTimestamp(currentTime)}</p>
+            <textarea
+              className="w-full p-1 text-xs rounded bg-black border border-gray-600"
+              rows={2}
+              placeholder="Add comment..."
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+            />
+            <button
+              className={`mt-1 w-full px-2 py-1 rounded text-xs ${
+                isCoach
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-gray-500 opacity-50 cursor-not-allowed"
+              }`}
+              disabled={!isCoach}
+              onClick={handleSubmitComment}
+            >
+              Submit
+            </button>
           </div>
-      <div className="mt-2">
-        <p className="mb-1 italic">Timestamp: {formatTimestamp(currentTime)}</p>
-        <textarea
-          className="w-full p-2 text-black"
-          placeholder="Add your comment"
-          value={commentText}
-          onChange={(e) => setCommentText(e.target.value)}
-        />
-        <button
-          className="mt-1 bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-          onClick={handleSubmitComment}
-        >
-          Submit Comment
-        </button>
+        )}
       </div>
     </div>
   );
@@ -105,7 +114,6 @@ function formatTimestamp(seconds) {
   const secs = Math.floor(seconds % 60);
   const paddedMins = hrs > 0 ? String(mins).padStart(2, "0") : mins;
   const paddedSecs = String(secs).padStart(2, "0");
-
   return hrs > 0
     ? `${hrs}:${paddedMins}:${paddedSecs}`
     : `${paddedMins}:${paddedSecs}`;

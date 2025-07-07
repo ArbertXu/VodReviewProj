@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { auth, signInWithEmailAndPassword } from "../firebaseAuth";
 import { useNavigate } from "react-router-dom";
+import Dashboard from "../assets/components/dashboard";
 function UserLogin() {
     const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -8,6 +9,7 @@ function UserLogin() {
   
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value });
+    e.preventDefault()
   };
 
   const handleSubmit = async (e) => {
@@ -42,6 +44,8 @@ function UserLogin() {
   };
 
   return (
+    <>
+    <Dashboard/>
      <div className="flex items-center justify-center min-h-screen">
             <div className="w-full max-w-md p-4">
             <h2 className="text-white text-center text-2xl mb-4">User Login</h2>
@@ -81,6 +85,7 @@ function UserLogin() {
             </form>
             </div>
         </div>
+        </>
         );
 }
 

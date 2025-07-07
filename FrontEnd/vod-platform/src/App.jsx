@@ -6,6 +6,7 @@ import UserLogin from './pages/userLogin'
 import CoachLogin from './pages/coachLogin'
 import UserRegistration from './pages/UserRegistration'
 import VODPage from './pages/VODpage'
+import Explore from './pages/ExplorePage'
 function App() {
 
   return (
@@ -14,9 +15,10 @@ function App() {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/login/user' element={<UserLogin />}/>
-          <Route path='/login/coach' element={<CoachLogin />}/>
+          {/* <Route path='/login/coach' element={<CoachLogin />}/> */}
           <Route path='registration/user' element={<UserRegistration/>}/>
           <Route path='/VODS' element={<VODPage/>}/>
+          <Route path='/explore' element={<Explore/>}></Route>
         </Routes>
       </div>
     </Router>

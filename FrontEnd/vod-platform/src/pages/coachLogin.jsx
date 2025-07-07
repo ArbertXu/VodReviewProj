@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Dashboard from "../assets/components/dashboard";
 function CoachLogin() {
     const navigate = useNavigate();
     const[formData, setFormData] = useState({
@@ -34,6 +35,8 @@ function CoachLogin() {
     }
 
     return (
+        <>
+            <Dashboard/>
         <div className="flex items-center justify-center min-h-screen">
             <div className="w-full max-w-md p-4">
             <h2 className="text-white text-center text-2xl mb-4">Coach Login</h2>
@@ -73,6 +76,7 @@ function CoachLogin() {
             </form>
             </div>
         </div>
+        </>
     )
 }
 export default CoachLogin

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import VideoPlayer from "../assets/components/VideoPlayer";
 import Dashboard from "../assets/components/dashboard";
 import CommentSection from "../assets/components/commentForm";
 export default function VodTest() {
@@ -7,7 +6,6 @@ export default function VodTest() {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [userID, setUserID] = useState(null);
-  const [vodComments, setvodComments] = useState({});
 
   useEffect(() => {
     const storedUserID = sessionStorage.getItem("user_id");
@@ -16,7 +14,8 @@ export default function VodTest() {
     }
   }, []);
     useEffect(() => {
-        if (!userID) return;
+        console.log(userID);    
+        if (userID === null) return;
         fetch(`http://localhost:3000/api/vods/user/${userID}`)
         .then((res) => res.json())
         .then((data) => {
@@ -28,25 +27,7 @@ export default function VodTest() {
     useEffect(() => {
   console.log("VOD URLs:", vods.map(v => v.url));
 }, [vods]);
-  useEffect(() => {
-    if (!userID) return;
-    const fetchComments = async () => {
-        const allComments = {}
-        for (const vod of vods) {
-            try {
-                const res = await fetch(`http://localhost:3000/api/vod_comments/${vod.vod_id}`)
-                const data = await res.json()
-                allComments[vod.vod_id] = data
-            } catch (err) {
-                console.error(`Error fetching comments for VOD ${vod.vod_id}`, err)
-            }
-        }
-        setvodComments(allComments)
-    }
-    if (vods.length > 0)
- {
-    fetchComments()
- }  }, [vods])
+  
 
 
   const handleFileChange = (e) => {
@@ -94,7 +75,6 @@ export default function VodTest() {
     }
     
   };
-  
 
 
 
@@ -102,7 +82,7 @@ export default function VodTest() {
     
     <div className="p-4">
         <Dashboard/>
-      <h2 className="text-xl font-bold mb-4">Upload a New VOD</h2>
+      <h2 className="text-xl font-bold mb-4 text-white">Upload a New VOD</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4 flex justify-center">
         <input
@@ -119,14 +99,13 @@ export default function VodTest() {
         </button>
       </form>
       <h1 className="text-2xl p-5 text-white">Your VODS</h1>
-                  {vods.map((vod) => (
-  <div key={vod.vod_id} className="mb-8">
-
-    <CommentSection vod={vod}/>
-  </div>
-    ))}
-
-
+      <div className="flex flex-wrap gap-4">
+            {vods.map((vod) => (
+                <CommentSection vod={vod} canComment={false}/>
+            ))}
+      </div>
+                  
     </div>
   );
 }
+
