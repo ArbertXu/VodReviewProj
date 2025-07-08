@@ -32,10 +32,10 @@ router.get("/vods/user/:user_id", async(req, res) => {
 })
 
 router.post("/vods", async (req, res) => {
-  const { url, user_id, date_uploaded, s3key } = req.body;
-  const {data, error } = await superbase
+  const { url, user_id, date_uploaded, s3_key } = req.body;
+  const {data, error } = await supabase
   .from("vods")
-  .insert([{url, user_id, date_uploaded, s3key}])
+  .insert([{url, user_id, date_uploaded, s3_key}])
   .select()
   .single();
   if(error) {
