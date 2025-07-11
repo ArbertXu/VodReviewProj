@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function CommentSection({ vod, canComment = true, isCoach = false }) {
+export default function CommentSection({ vod, canComment = true, isCoach = false, uploaderName, uploaderIMG }) {
   const [commentText, setCommentText] = useState("");
   const [currentTime, setCurrentTime] = useState(0);
   const [videoRef, setVideoRef] = useState(null);
@@ -15,6 +15,11 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
       setCurrentTime(videoRef.currentTime);
     }
   };
+  const seekTime = (seconds) => {
+    if (videoRef) {
+        videoRef.currentTime = seconds;
+    }
+  }
 
   const handleSubmitComment = async () => {
     if (!commentText.trim()) return;
@@ -55,6 +60,19 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
 
   return (
     <div className="bg-[#1a1a1a] text-white rounded-md p-2 shadow-md w-90 flex flex-col text-xs">
+      {uploaderName && (
+        <div className="text-xs mb-1 text-gray-400 flex items-center gap-2">
+          {uploaderIMG && (
+            <img
+              src={uploaderImg}
+              alt="Uploader"
+              className="w-5 h-5 rounded-full object-cover"
+            />
+          )}
+          <span>Uploaded by: {uploaderName}</span>
+        </div>
+      )}
+
       <video
         controls
         onTimeUpdate={handleTimeUpdate}
@@ -70,7 +88,7 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
           {comments.length > 0 ? (
             comments.map((c, i) => (
               <div key={i} className="bg-gray-800 p-1 rounded">
-                <p className="text-green-400">{formatTimestamp(c.timestamp_seconds)}</p>
+                <p className="text-green-400 cursor-pointer hover:underline" onClick={() => seekTime(c.timestamp_seconds)}>{formatTimestamp(c.timestamp_seconds)} </p>
                 <p>{c.comments}</p>
               </div>
             ))
@@ -118,3 +136,5 @@ function formatTimestamp(seconds) {
     ? `${hrs}:${paddedMins}:${paddedSecs}`
     : `${paddedMins}:${paddedSecs}`;
 }
+
+

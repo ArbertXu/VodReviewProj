@@ -14,7 +14,7 @@ export default function explore() {
             setVods(data);
         })
         .catch((err) => console.error("Error fetching VODs:", err));
-    })
+    }, []);
     useEffect(() => {
       const auth = getAuth()
       auth.currentUser?.getIdTokenResult().then((idTokenResult) => {
@@ -27,11 +27,17 @@ export default function explore() {
     
     <div className="p-4">
         <Dashboard/>
-
       <h1 className="text-2xl p-5 text-white">Explore VODS</h1>
       <div className="flex flex-wrap gap-4">
                   {vods.map((vod) => (
-                <CommentSection vod={vod} canComment={true} isCoach={isCoach}/>
+                <CommentSection
+                  key={vod.id}
+                  vod={vod}
+                  canComment={true}
+                  isCoach={isCoach}
+                  uploaderName={vod.user_data?.username}
+                  uploaderImg={vod.user_data?.profile_img_url}
+                />
             ))}
       </div>
     </div>

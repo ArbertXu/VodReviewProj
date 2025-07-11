@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Dashboard from "../assets/components/dashboard";
 import CommentSection from "../assets/components/commentForm";
+import UploadForm from "../assets/components/UploadFile";
+
 export default function VodTest() {
   const [vods, setVods] = useState([]);
   const [file, setFile] = useState(null);
@@ -30,8 +32,8 @@ export default function VodTest() {
   
 
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+  const handleFileChange = (selectedFile) => {
+    setFile(selectedFile);
   };
 
   const handleSubmit = async (e) => {
@@ -84,20 +86,14 @@ export default function VodTest() {
         <Dashboard/>
       <h2 className="text-xl font-bold mb-4 text-white">Upload a New VOD</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4 flex justify-center">
-        <input
-          type="file"
-          accept="video/*"
-          onChange={handleFileChange}
-        />
-        <button
-          type="submit"
-          disabled={uploading}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          {uploading ? "Uploading..." : "Upload VOD"}
-        </button>
-      </form>
+      <UploadForm
+        buttonText="Submit VOD"
+        fileLabel="Upload your match clip"
+        onSubmit={handleSubmit}
+        onFileChange={handleFileChange}
+        uploading={uploading}
+      />
+
       <h1 className="text-2xl p-5 text-white">Your VODS</h1>
       <div className="flex flex-wrap gap-4">
             {vods.map((vod) => (

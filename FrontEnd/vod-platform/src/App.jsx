@@ -7,6 +7,7 @@ import CoachLogin from './pages/coachLogin'
 import UserRegistration from './pages/UserRegistration'
 import VODPage from './pages/VODpage'
 import Explore from './pages/ExplorePage'
+import ErrPage from './pages/404'
 function App() {
 
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path='registration/user' element={<UserRegistration/>}/>
           <Route path='/VODS' element={<VODPage/>}/>
           <Route path='/explore' element={<Explore/>}></Route>
+          <Route path='*' element={<ErrPage/>}></Route>
         </Routes>
       </div>
     </Router>

@@ -48,21 +48,21 @@ function UserRegistration() {
                 type="text"
                 name="username"
                 placeholder="Username"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1"
                 onChange={handleChange}
                 />
                 <input
                 type="email"
                 name="email"
                 placeholder="Email"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1"
                 onChange={handleChange}
                 />
                 <input
                 type="password"
                 name="password"
                 placeholder="Password"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1"
                 onChange={handleChange}
                 />
                 <input

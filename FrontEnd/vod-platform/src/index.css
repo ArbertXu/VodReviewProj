@@ -2,11 +2,11 @@
 @import "tailwindcss";
 
 body {
-  @apply bg-gray-800;
+  @apply bg-black;
 }
 /* @tailwind base;
 @tailwind components;
 @tailwind utilities; */
 form {
-  @apply bg-gray-700;
+ 
 }

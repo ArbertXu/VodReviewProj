@@ -57,14 +57,14 @@ function UserLogin() {
                 type="email"
                 name="email"
                 placeholder="Email"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1"
                 onChange={handleChange}
                 />
                 <input
                 type="password"
                 name="password"
                 placeholder="Password"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1"
                 onChange={handleChange}
                 />
                 <button type="submit" onClick={() => navigate("/")} className="btn bg-blue-500 hover:bg-blue-700 w-full">
