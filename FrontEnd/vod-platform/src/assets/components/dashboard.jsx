@@ -3,7 +3,7 @@ import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { href } from 'react-router-dom'
 import { getAuth, signOut } from 'firebase/auth'
 import { useNavigate } from "react-router-dom";
-
+import {useState, useEffect} from "react";
 const navigation = [
   { name: 'My VODS', href: '/VODS', current: false },
   { name: 'Login', href: '/login/user', current: false },
@@ -17,8 +17,18 @@ function classNames(...classes) {
 }
 
 export default function Dashboard() {
+  const [userID, setUserID] = useState(null);
+  
   const navigate = useNavigate()
   const auth = getAuth()
+
+  useEffect(() => {
+      const storedUserID = sessionStorage.getItem("user_id");
+      if (storedUserID) {
+        setUserID(storedUserID);
+      }
+    }, []);
+  
   const handleSignOut = async () => {
     try {
       await signOut(auth);
@@ -89,7 +99,7 @@ export default function Dashboard() {
               >
                 <MenuItem>
                   <a
-                    href="#"
+                    href={`/profile/${userID}`}
                     className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                   >
                     Your Profile
