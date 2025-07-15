@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import Dashboard from "../assets/components/dashboard";
 import CommentSection from "../assets/components/commentForm";
 import UploadForm from "../assets/components/UploadFile";
-
+import { Link } from "react-router-dom";
 export default function VodTest() {
   const [vods, setVods] = useState([]);
   const [file, setFile] = useState(null);
@@ -38,43 +38,84 @@ export default function VodTest() {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
-    if (!file) {
-      alert("Please select a video file");
+    if (!file || !userID) {
+      alert("Please select a video file and login");
       return;
     }
 
     setUploading(true);
+    try {
+      const fileType = file.type;
+      const fileName = file.name;
 
-    const formData = new FormData();
-    formData.append("video", file);
-    formData.append("user_id", userID);
-     try {
-      const res = await fetch("http://localhost:3000/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const {url, s3_key, date_uploaded} = await res.json();
-      console.log("Upload success:");
-
-      const metadataRes = await fetch("http://localhost:3000/api/vods", {
+      const res = await fetch("http://localhost:3000/api/get-upload-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          url,
-          user_id: userID, 
-          s3_key,
-          date_uploaded,
-        }),
-      });
+        body: JSON.stringify({fileName, fileType}),
+      })
+      
+      const {uploadURL, fileKey} = await res.json();
+      
+      const s3Res = await fetch(uploadURL, {
+        method: "PUT",
+        headers: { "Content-Type": fileType },
+        body: file,
+      })
 
-      const newVod = await metadataRes.json();
-      setVods((prev) => [...prev, newVod]);
-      setFile(null);
-    } catch (err) {
-      console.error("Upload error:", err);
-    } finally {
-      setUploading(false);
+      if (!s3Res.ok) throw new Error("Upload to S3 failed");
+
+      const publicURL = `https://${import.meta.env.VITE_S3_BUCKET}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${fileKey}`;
+
+       const metadataRes = await fetch("http://localhost:3000/api/vods", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            url: publicURL,
+            s3_key: fileKey,
+            date_uploaded: new Date().toISOString(),
+            user_id: userID,
+          }),
+        });
+
+        const newVod = await metadataRes.json();
+        setVods((prev) => [...prev, newVod]);
+        setFile(null);
+      } catch (err) {
+        console.error("Error uploading:", err);
+      } finally {
+        setUploading(false);
     }
+
+    // const formData = new FormData();
+    // formData.append("video", file);
+    // formData.append("user_id", userID);
+    //  try {
+    //   const res = await fetch("http://localhost:3000/api/upload", {
+    //     method: "POST",
+    //     body: formData,
+    //   });
+    //   const {url, s3_key, date_uploaded} = await res.json();
+    //   console.log("Upload success:");
+
+    //   const metadataRes = await fetch("http://localhost:3000/api/vods", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({
+    //       url,
+    //       user_id: userID, 
+    //       s3_key,
+    //       date_uploaded,
+    //     }),
+    //   });
+
+    //   const newVod = await metadataRes.json();
+    //   setVods((prev) => [...prev, newVod]);
+    //   setFile(null);
+    // } catch (err) {
+    //   console.error("Upload error:", err);
+    // } finally {
+    //   setUploading(false);
+    // }
     
   };
 
@@ -97,7 +138,9 @@ export default function VodTest() {
       <h1 className="text-2xl p-5 text-white">Your VODS</h1>
       <div className="flex flex-wrap gap-4">
             {vods.map((vod) => (
-                <CommentSection vod={vod} canComment={false}/>
+              <Link key={vod.vod_id} to={`/vod/${vod_id}`}>
+                 <CommentSection vod={vod} canComment={false}/>
+              </Link>
             ))}
       </div>
                   

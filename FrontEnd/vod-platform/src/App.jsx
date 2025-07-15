@@ -9,6 +9,7 @@ import VODPage from './pages/VODpage'
 import Explore from './pages/ExplorePage'
 import ErrPage from './pages/404'
 import ProfilePage from "./pages/profile"
+import VodPost from "./pages/VodPost"
 function App() {
 
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path='/explore' element={<Explore/>}></Route>
           <Route path='*' element={<ErrPage/>}></Route>
           <Route path="/profile/:userID" element={<ProfilePage />} />
+          <Route path="/vod/:vod_id" element={<VodPost/>} />
         </Routes>
       </div>
     </Router>

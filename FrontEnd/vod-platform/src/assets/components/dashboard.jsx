@@ -18,9 +18,10 @@ function classNames(...classes) {
 
 export default function Dashboard() {
   const [userID, setUserID] = useState(null);
-  
+  const [userData, setUserData] = useState(null);
   const navigate = useNavigate()
   const auth = getAuth()
+
 
   useEffect(() => {
       const storedUserID = sessionStorage.getItem("user_id");
@@ -28,6 +29,21 @@ export default function Dashboard() {
         setUserID(storedUserID);
       }
     }, []);
+
+    useEffect(() => {
+        if (!userID) return;
+        fetch(`http://localhost:3000/api/user/${userID}`)
+        .then((res) => res.json())
+        .then((data) => {
+            setUserData(data)
+        })
+        .catch((err) => {
+            console.error("Failed to get data:", err)
+        });
+
+    }, [userID]);
+
+
   
   const handleSignOut = async () => {
     try {
@@ -88,7 +104,7 @@ export default function Dashboard() {
                   <span className="sr-only">Open user menu</span>
                   <img
                     alt=""
-                    src="/Images/DefaultPFP.jpg"
+                    src={userData? userData.profile_img_url : "/Images/DefaultPFP.jpg"}
                     className="size-8 rounded-full"
                   />
                 </MenuButton>

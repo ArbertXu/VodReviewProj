@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 
-export default function CommentSection({ vod, canComment = true, isCoach = false, uploaderName, uploaderIMG }) {
+export default function CommentSection({ vod, canComment = true, isCoach = false, uploaderName, uploaderIMG, variant = "card", }) {
   const [commentText, setCommentText] = useState("");
   const [currentTime, setCurrentTime] = useState(0);
   const [videoRef, setVideoRef] = useState(null);
   const [comments, setComments] = useState([]);
+
+  
 
   useEffect(() => {
     fetchComments();
@@ -59,9 +61,15 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
   };
 
   return (
-    <div className="bg-[#1a1a1a] text-white rounded-md p-2 shadow-md w-90 flex flex-col text-xs">
+    <div className={`bg-[#1a1a1a] text-white rounded-md p-2 shadow-md flex flex-col  ${variant === "page"
+      ? "w-fit text-xl align-center"
+      : "w-90 text-xs"
+    }`}>
       {uploaderName && (
-        <div className="text-xs mb-1 text-gray-400 flex items-center gap-2">
+        <div className={` mb-1 text-gray-400 flex items-center gap-2 ${variant === "page"
+          ? "text-xl"
+          : "text-xs"
+        }`}>
           {uploaderIMG && (
             <img
               src={uploaderImg}
@@ -72,19 +80,22 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
           <span>Uploaded by: {uploaderName}</span>
         </div>
       )}
-
+      <div className={`${variant === "page"  ? "flex justify-center w-full" : ""}`}>
       <video
         controls
         onTimeUpdate={handleTimeUpdate}
         ref={(ref) => setVideoRef(ref)}
-        className="w-full rounded-md"
+        className={` rounded-md ${variant === "page"
+          ? "max-w-xl w-full"
+          :""
+        }`}
       >
         <source src={vod.url} type="video/mp4" />
       </video>
-
+      </div>
       <div className="mt-2 flex flex-col flex-grow">
         <p className="font-semibold mb-1 text-xs">Comments:</p>
-        <div className="space-y-1 max-h-10 overflow-y-auto pr-1">
+        <div className={`space-y-1 pr-1 ${variant === "page" ? "" : "max-h-10 overflow-y-auto"}`}>
           {comments.length > 0 ? (
             comments.map((c, i) => (
               <div key={i} className="bg-gray-800 p-1 rounded">
