@@ -18,7 +18,7 @@ export default function VodTest() {
     useEffect(() => {
         console.log(userID);    
         if (userID === null) return;
-        fetch(`http://localhost:3000/api/vods/user/${userID}`)
+        fetch(`${import.meta.env.VITE_URL_API}/api/vods/user/${userID}`)
         .then((res) => res.json())
         .then((data) => {
             console.log("Fetched VOD data:", data);
@@ -48,7 +48,7 @@ export default function VodTest() {
       const fileType = file.type;
       const fileName = file.name;
 
-      const res = await fetch("http://localhost:3000/api/get-upload-url", {
+      const res = await fetch(`${import.meta.env.VITE_URL_API}/api/get-upload-url`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({fileName, fileType}),
@@ -66,7 +66,7 @@ export default function VodTest() {
 
       const publicURL = `https://${import.meta.env.VITE_S3_BUCKET}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${fileKey}`;
 
-       const metadataRes = await fetch("http://localhost:3000/api/vods", {
+       const metadataRes = await fetch(`${import.meta.env.VITE_URL_API}/api/vods`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -85,37 +85,6 @@ export default function VodTest() {
       } finally {
         setUploading(false);
     }
-
-    // const formData = new FormData();
-    // formData.append("video", file);
-    // formData.append("user_id", userID);
-    //  try {
-    //   const res = await fetch("http://localhost:3000/api/upload", {
-    //     method: "POST",
-    //     body: formData,
-    //   });
-    //   const {url, s3_key, date_uploaded} = await res.json();
-    //   console.log("Upload success:");
-
-    //   const metadataRes = await fetch("http://localhost:3000/api/vods", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({
-    //       url,
-    //       user_id: userID, 
-    //       s3_key,
-    //       date_uploaded,
-    //     }),
-    //   });
-
-    //   const newVod = await metadataRes.json();
-    //   setVods((prev) => [...prev, newVod]);
-    //   setFile(null);
-    // } catch (err) {
-    //   console.error("Upload error:", err);
-    // } finally {
-    //   setUploading(false);
-    // }
     
   };
 
