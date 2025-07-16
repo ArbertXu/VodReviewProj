@@ -1,5 +1,5 @@
 const express = require("express");
-const verifyFirebaseToken = require("./authmiddleware");
+const verifyFirebaseToken = require("./authmiddleware.js");
 
 const router = express.Router();
 
