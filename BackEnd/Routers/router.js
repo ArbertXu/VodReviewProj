@@ -1,10 +1,11 @@
 const express = require("express")
 const {admin, setCoachClaim} = require("../firebase.js")
+const supabase = require("../database");
 const router = express.Router()
 
 router.post("/register", async (req, res) => {
     console.log(req.body)
-    const {email, password, role} = req.body
+    const {username, email, password, role} = req.body
     try {
         const user = await admin.auth().createUser({
             email,
@@ -13,13 +14,22 @@ router.post("/register", async (req, res) => {
         if (role == "coach") {
             await setCoachClaim(user.uid)
         }
-        // await admin.auth().setCustomUserClaims(user.uid, {role})
-        // await admin.firestore().collection("users").doc(user.uid).set({
-        //     username,
-        //     email,
-        //     role,
-        //     createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        // })
+
+        const {data, error} = await supabase.from("user_data")
+        .insert([
+            {
+                firebase_id: user.uid,
+                email,
+                username,
+                profile_img_url: "https://picsum.photos/200/200",
+                role,
+                created_at: new Date().toISOString(),
+            }
+        ]).select()
+        if (error) {
+            console.error("error creating user:", error);
+            return res.status(500).json({error: error.message})
+        }
         res.status(201).json({message: "User registered", uid: user.uid})
     } catch (err) {
         console.error(err);

@@ -10,19 +10,17 @@ app.use(bodyParser.json());
 const protectedRoute = require("./Routers/loginRouter")
 const authRouter = require("./Routers/router");
 const vodRouter = require("./Routers/VODdatabasRouter");
-// const getVidRouter = require("./Routers/getVODS");
 const CommentRouter = require("./Routers/notesRouter");
 app.use("/api", authRouter);
 app.use("/api", protectedRoute)
 app.use("/api", vodRouter)
 app.use("/api", s3UploadRoutes);
-// app.use("/api", getVidRouter);
 app.use("/api", CommentRouter);
 app.get("/", (req, res) => {
   res.send("Backend is running!");
 });
 
-const PORT =  3000;
+const PORT =  process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
