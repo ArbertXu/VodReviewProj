@@ -18,7 +18,7 @@ export default function VodTest() {
     useEffect(() => {
         console.log(userID);    
         if (userID === null) return;
-        fetch(`${import.meta.env.VITE_URL_API}/api/vods/user/${userID}`)
+        fetch(`${import.meta.env.VITE_API_URL}/api/vods/user/${userID}`)
         .then((res) => res.json())
         .then((data) => {
             console.log("Fetched VOD data:", data);
@@ -48,7 +48,7 @@ export default function VodTest() {
       const fileType = file.type;
       const fileName = file.name;
 
-      const res = await fetch(`${import.meta.env.VITE_URL_API}/api/get-upload-url`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/get-upload-url`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({fileName, fileType}),
@@ -66,7 +66,7 @@ export default function VodTest() {
 
       const publicURL = `https://${import.meta.env.VITE_S3_BUCKET}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${fileKey}`;
 
-       const metadataRes = await fetch(`${import.meta.env.VITE_URL_API}/api/vods`, {
+       const metadataRes = await fetch(`${import.meta.env.VITE_API_URL}/api/vods`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

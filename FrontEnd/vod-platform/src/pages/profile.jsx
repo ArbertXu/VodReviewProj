@@ -16,7 +16,7 @@ export default function ProfilePage()
   }, []);   
     useEffect(() => {
         if (!userID) return;
-        fetch(`${import.meta.env.VITE_URL_API}/api/user/${userID}`)
+        fetch(`${import.meta.env.VITE_API_URL}/api/user/${userID}`)
         .then((res) => res.json())
         .then((data) => {
             setUserData(data)
@@ -34,7 +34,7 @@ export default function ProfilePage()
         const fileName = selectedImage.name;
 
         try {
-             const res = await fetch(`${import.meta.env.VITE_URL_API}/api/get-upload-url`, {
+             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/get-upload-url`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({fileName, fileType}),
@@ -49,7 +49,7 @@ export default function ProfilePage()
             if (!s3Res.ok) throw new Error("Upload to S3 failed");
             const publicURL = `https://${import.meta.env.VITE_S3_BUCKET}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${fileKey}`;
 
-            const updateRes = await fetch(`${import.meta.env.VITE_URL_API}/api/user/profile-image`, {
+            const updateRes = await fetch(`${import.meta.env.VITE_API_URL}/api/user/profile-image`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({user_id: userID, profile_img_url: publicURL}),
@@ -66,7 +66,12 @@ export default function ProfilePage()
         const triggerFileInput = () => {
             fileInputRef.current?.click();
         };
-    if(!userData) return <p className="text-white">LOGIN</p>;
+    if(!userData) return (
+        <>
+        <Dashboard/>
+        <p className="text-white">LOGIN</p>
+        </>
+        );
     return (
         <>
         <Dashboard/>

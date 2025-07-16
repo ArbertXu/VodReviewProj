@@ -27,7 +27,7 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
     if (!commentText.trim()) return;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_URL_API}/api/vod_comments`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/vod_comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -52,7 +52,7 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
 
   const fetchComments = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_URL_API}/api/vod_comments/${vod.vod_id}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/vod_comments/${vod.vod_id}`);
       const data = await res.json();
       setComments(data);
     } catch (err) {

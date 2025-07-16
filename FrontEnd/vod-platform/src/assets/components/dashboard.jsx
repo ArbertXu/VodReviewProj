@@ -32,7 +32,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (!userID) return;
-        fetch(`${import.meta.env.VITE_URL_API}/api/user/${userID}`)
+        fetch(`${import.meta.env.VITE_API_URL}/api/user/${userID}`)
         .then((res) => res.json())
         .then((data) => {
             setUserData(data)
