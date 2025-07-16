@@ -61,23 +61,23 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
   };
 
   return (
-    <div className={`bg-[#1a1a1a] text-white rounded-md p-2 shadow-md flex flex-col  ${variant === "page"
-      ? "w-fit text-xl align-center"
+    <div className={`bg-[#1a1a1a] text-white rounded-md p-4 shadow-lg flex flex-col gap-4  ${variant === "page"
+      ? "w-fit text-sm align-center"
       : "w-90 text-xs"
     }`}>
       {uploaderName && (
-        <div className={` mb-1 text-gray-400 flex items-center gap-2 ${variant === "page"
+        <div className={` mb-1 text-white font-bold flex items-center gap-2 ${variant === "page"
           ? "text-xl"
           : "text-xs"
         }`}>
           {uploaderIMG && (
             <img
-              src={uploaderImg}
+              src={uploaderIMG}
               alt="Uploader"
               className="w-5 h-5 rounded-full object-cover"
             />
           )}
-          <span>Uploaded by: {uploaderName}</span>
+          <span>{uploaderName}</span>
         </div>
       )}
       <div className={`${variant === "page"  ? "flex justify-center w-full" : ""}`}>
@@ -86,7 +86,7 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
         onTimeUpdate={handleTimeUpdate}
         ref={(ref) => setVideoRef(ref)}
         className={` rounded-md ${variant === "page"
-          ? "max-w-xl w-full"
+          ? " w-full" 
           :""
         }`}
       >
@@ -95,7 +95,7 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
       </div>
       <div className="mt-2 flex flex-col flex-grow">
         <p className="font-semibold mb-1 text-xs">Comments:</p>
-        <div className={`space-y-1 pr-1 ${variant === "page" ? "" : "max-h-10 overflow-y-auto"}`}>
+        <div className={`space-y-2 ${variant === "page" ? "" : " h-10 overflow-y-auto"}`}>
           {comments.length > 0 ? (
             comments.map((c, i) => (
               <div key={i} className="bg-gray-800 p-1 rounded">

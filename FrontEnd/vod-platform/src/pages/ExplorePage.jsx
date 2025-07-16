@@ -35,7 +35,7 @@ export default function explore() {
                       <CommentSection
                         key={vod.id}
                         vod={vod}
-                        canComment={true}
+                        canComment={false}
                         isCoach={isCoach}
                         uploaderName={vod.user_data?.username}
                         uploaderImg={vod.user_data?.profile_img_url}

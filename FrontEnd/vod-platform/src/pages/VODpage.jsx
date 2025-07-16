@@ -138,12 +138,11 @@ export default function VodTest() {
       <h1 className="text-2xl p-5 text-white">Your VODS</h1>
       <div className="flex flex-wrap gap-4">
             {vods.map((vod) => (
-              <Link key={vod.vod_id} to={`/vod/${vod_id}`}>
+              <Link key={vod.vod_id} to={`/vod/${vod.vod_id}`}>
                  <CommentSection vod={vod} canComment={false}/>
               </Link>
             ))}
-      </div>
-                  
+      </div> 
     </div>
   );
 }
