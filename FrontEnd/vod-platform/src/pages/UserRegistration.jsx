@@ -16,6 +16,7 @@ function UserRegistration() {
         console.log("Submitting form:", formData);
         e.preventDefault();
         try {
+            console.log("VITE_API_URL:", import.meta.env.VITE_API_URL);
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/register`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
