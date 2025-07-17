@@ -8,7 +8,7 @@ export default function explore() {
   const [isCoach, setIsCoach] = useState(false);
 
     useEffect(() => {
-        fetch(`${import.meta.env.VITE_URL_API}/api/explore`)
+        fetch(`${import.meta.env.VITE_API_URL}/api/explore`)
         .then((res) => res.json())
         .then((data) => {
             console.log("Fetched VOD data:", data);

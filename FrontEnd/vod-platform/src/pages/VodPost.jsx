@@ -8,7 +8,7 @@ export default function VodPost() {
     const [Vod, setVod] = useState(null);
 
     useEffect(() => {
-        fetch(`${import.meta.env.VITE_URL_API}/api/vods/id/${vod_id}`)
+        fetch(`${import.meta.env.VITE_API_URL}/api/vods/id/${vod_id}`)
         .then((res) => res.json())
         .then((data) => setVod(data))
         .catch((err) => console.error("Failed to get vod:", err))
