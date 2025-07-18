@@ -4,13 +4,7 @@ import { href } from 'react-router-dom'
 import { getAuth, signOut } from 'firebase/auth'
 import { useNavigate } from "react-router-dom";
 import {useState, useEffect} from "react";
-const navigation = [
-  { name: 'My VODS', href: '/VODS', current: false },
-  { name: 'Login', href: '/login/user', current: false },
-  // { name: 'Login as Coach', href: '/login/coach', current: false },
-  { name: 'Register', href: '/registration/user', current: false },
-  {name: 'Explore', href: '/explore', current: false},
-]
+
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -21,14 +15,25 @@ export default function Dashboard() {
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate()
   const auth = getAuth()
+  const isLoggedIn = Boolean(userID);
 
 
-  useEffect(() => {
-      const storedUserID = sessionStorage.getItem("user_id");
-      if (storedUserID) {
-        setUserID(storedUserID);
-      }
-    }, []);
+useEffect(() => {
+const unsubscribe = auth.onAuthStateChanged((user) => {
+  console.log("Auth changed:", user);
+  if (user) {
+    sessionStorage.setItem("user_id", user.uid);
+    setUserID(user.uid);
+  } else {
+    sessionStorage.removeItem("user_id")
+    setUserID(null)
+    setUserData(null)
+    
+  }
+  });
+
+  return () => unsubscribe();
+}, []);
 
     useEffect(() => {
         if (!userID) return;
@@ -43,8 +48,14 @@ export default function Dashboard() {
 
     }, [userID]);
 
-
-  
+    const navigation = [
+    { name: 'My VODS', href: '/VODS', show: isLoggedIn },
+    { name: 'Login', href: '/login/user', show: !isLoggedIn },
+    // { name: 'Login as Coach', href: '/login/coach', current: false },
+    { name: 'Register', href: '/registration/user', show: !isLoggedIn },
+    {name: 'Explore', href: '/explore', show: true},
+    ]
+    
   const handleSignOut = async () => {
     try {
       await signOut(auth);
@@ -70,7 +81,7 @@ export default function Dashboard() {
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
-                {navigation.map((item) => (
+                {navigation.filter(item => item.show).map((item) => (
                   <a
                     key={item.name}
                     href={item.href}
@@ -129,11 +140,13 @@ export default function Dashboard() {
                     Settings
                   </a>
                 </MenuItem>
-                <MenuItem>
+                { isLoggedIn && (
+                  <MenuItem >
                   <button onClick={handleSignOut} className='block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden w-full'>
                     Sign Out
                   </button>
                 </MenuItem>
+                )}
               </MenuItems>
             </Menu>
           </div>

@@ -3,12 +3,43 @@ import Dashboard from "../assets/components/dashboard";
 import CommentSection from "../assets/components/commentForm";
 import UploadForm from "../assets/components/UploadFile";
 import { Link } from "react-router-dom";
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { fetchFile, toBlobURL } from '@ffmpeg/util';
 export default function VodTest() {
   const [vods, setVods] = useState([]);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [userID, setUserID] = useState(null);
+  const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [error, setError] = useState('');
+  const ffmpegRef = useRef(null);
 
+  useEffect(() => {
+    const initFFmpeg = async () => {
+      if (!ffmpegRef.current) {
+        ffmpegRef.current = new FFmpeg();
+        ffmpegRef.current.on('progress', ({ progress }) => {
+          setUploadProgress(Math.round(progress * 100));
+        });
+
+        try {
+          await ffmpegRef.current.load({
+            coreURL: await toBlobURL(`${import.meta.env.VITE_FFMPEG_CORE_URL}/ffmpeg-core.js`, 'text/javascript'),
+            wasmURL: await toBlobURL(`${import.meta.env.VITE_FFMPEG_CORE_URL}/ffmpeg-core.wasm`, 'application/wasm'),
+          });
+          
+          setFfmpegLoaded(true);
+          console.log('FFmpeg loaded successfully');
+        } catch (error) {
+          console.error('Failed to load FFmpeg:', error);
+          setError('Failed to initialize video processor. Please refresh the page.');
+        }
+      }
+    };
+
+    initFFmpeg();
+  }, []);
   useEffect(() => {
     const storedUserID = sessionStorage.getItem("user_id");
     if (storedUserID) {
@@ -34,7 +65,21 @@ export default function VodTest() {
 
   const handleFileChange = (selectedFile) => {
     setFile(selectedFile);
+    setError('');
   };
+
+  const validateFile = (file) => {
+    const maxSize = 500 * 1024 * 1024;
+    const allowedTypes = ['video/mp4', 'video/webm', 'video/mov', 'video/avi'];
+    
+    if (file.size > maxSize) {
+      throw new Error('File size too large. Maximum size is 500MB.');
+    }
+    if (!allowedTypes.includes(file.type)) {
+      throw new Error('Invalid file type. Please upload MP4, WebM, MOV, or AVI files.');
+    }
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
@@ -43,23 +88,76 @@ export default function VodTest() {
       return;
     }
 
+    if (!ffmpegLoaded) {
+      setError("Video processor not ready. Please wait and try again.");
+      return;
+    }
+
     setUploading(true);
+    setError('');
+    setUploadProgress(0);
     try {
-      const fileType = file.type;
-      const fileName = file.name;
+    validateFile(file);
+      
+    const ffmpeg = ffmpegRef.current;
+      
+      try {
+        await ffmpeg.deleteFile('input.mp4');
+        await ffmpeg.deleteFile('output.webm');
+      } catch (e) {
+
+      }
+      console.log('Starting video processing...');
+      const inputFileName = file.name.includes('.') ? 
+        `input.${file.name.split('.').pop()}` : 'input.mp4';
+      await ffmpeg.writeFile(inputFileName, await fetchFile(file));
+
+      const ffmpegArgs = [
+        '-i', inputFileName,
+        '-vf', 'scale=854:480:force_original_aspect_ratio=decrease,pad=854:480:(ow-iw)/2:(oh-ih)/2',
+        '-c:v', 'libx264', // Use H.264 instead of VP9
+        '-crf', '28', // Good quality for H.264
+        '-preset', 'ultrafast', // H.264 preset
+        '-c:a', 'aac', // Use AAC instead of Opus
+        '-b:a', '96k',
+        '-movflags', '+faststart', // Optimize for web streaming
+        'output.mp4' // Output as MP4
+      ];
+
+      console.log('FFmpeg command:', ffmpegArgs.join(' '));
+      
+      await ffmpeg.exec(ffmpegArgs);
+
+      console.log('Video processing completed');
+      
+      
+      const data = await ffmpeg.readFile('output.mp4');
+      
+      
+      await ffmpeg.deleteFile('input.mp4');
+      await ffmpeg.deleteFile('output.mp4');
+      
+
+      const compressedFile = new File([data.buffer], 'compressed.mp4', {type: 'video/mp4'});
+      const fileType = compressedFile.type;
+      const fileName = compressedFile.name;
 
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/get-upload-url`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({fileName, fileType}),
       })
+
+      if (!res.ok) {
+        throw new Error(`failed to get uplaoded URL: ${res.statusText}`)
+      }
       
       const {uploadURL, fileKey} = await res.json();
       
       const s3Res = await fetch(uploadURL, {
         method: "PUT",
         headers: { "Content-Type": fileType },
-        body: file,
+        body: compressedFile,
       })
 
       if (!s3Res.ok) throw new Error("Upload to S3 failed");
@@ -87,15 +185,22 @@ export default function VodTest() {
     }
     
   };
-
-
-
   return (
     
     <div className="p-4">
         <Dashboard/>
       <h2 className="text-xl font-bold mb-4 text-white">Upload a New VOD</h2>
+    {error && (
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
 
+      {uploading && (
+        <div className="mb-4 p-3 bg-blue-100 border border-blue-400 text-blue-700 rounded">
+          Processing video: {uploadProgress}%
+        </div>
+      )}
       <UploadForm
         buttonText="Submit VOD"
         fileLabel="Upload your match clip"
