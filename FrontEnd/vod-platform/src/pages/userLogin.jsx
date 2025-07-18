@@ -31,8 +31,8 @@ function UserLogin() {
     if (response.ok) {
       alert("Login successful and protected route accessed!");
       console.log("Protected response:", data);
-      const uid = userCredential.user.uid;
-      sessionStorage.setItem("user_id", uid);
+      // const uid = userCredential.user.uid;
+      // sessionStorage.setItem("user_id", uid);
 
     } else {
       alert("Failed to access protected route: " + data.error);
