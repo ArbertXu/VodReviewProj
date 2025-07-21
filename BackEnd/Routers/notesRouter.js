@@ -35,7 +35,7 @@ router.get("/vod_comments/:vodID", async (req, res) => {
     const { vodID } = req.params;
     const {data, error} = await supabase
     .from("vod_comments")
-    .select(`*, user_data(username, profile_image_url)`)
+    .select(`*, user_data(username, profile_img_url)`)
     .eq("vod_id", vodID)
     .order("timestamp_seconds", {ascending:true})
     if (error) {
@@ -45,15 +45,6 @@ router.get("/vod_comments/:vodID", async (req, res) => {
     res.json(data);
 });
 
-// router.get("/explore", async (req, res) => {
-//   const {data, error} = await supabase.from("vods").select(`*, user_data(username, profile_img_url)`);
-//   if (error) {
-//     console.error("ERROR at explore" ,error)
-//     return res.status(500).send("Error retrieving VODS");
-//   }
-  
-//   console.log("Fetched VODs:", data)
-//   res.json(data);
-// });
+
 
 module.exports = router
