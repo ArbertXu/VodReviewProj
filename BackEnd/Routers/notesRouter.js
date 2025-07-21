@@ -3,10 +3,10 @@ const router = express.Router();
 const supabase = require("../database");
 
 router.post("/vod_comments", async(req, res) => {
-    const {vod_id, timestamp_seconds, comments, created_at} = req.body;
+    const {vod_id, timestamp_seconds, comments, created_at, user_id} = req.body;
     const {data, error} = await supabase
     .from("vod_comments")
-    .insert([{vod_id, timestamp_seconds, comments, created_at}])
+    .insert([{vod_id, timestamp_seconds, comments, created_at, user_id}])
     .select()
     .single();
 
