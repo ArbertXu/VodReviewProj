@@ -4,9 +4,23 @@ const supabase = require("../database");
 
 router.post("/vod_comments", async(req, res) => {
     const {vod_id, timestamp_seconds, comments, created_at, user_id} = req.body;
+
+    const { data: userData, error: userError } = await supabase
+        .from("user_data")
+        .select("id")
+        .eq("firebase_id", user_id)
+        .single();
+
+        if (userError || !userData) {
+            console.error("Could not find user UUID:", userError);
+            return res.status(400).json({ error: "User not found" });
+        }
+    const uuid = userData.id;
+
+
     const {data, error} = await supabase
     .from("vod_comments")
-    .insert([{vod_id, timestamp_seconds, comments, created_at, user_id}])
+    .insert([{vod_id, timestamp_seconds, comments, created_at, uuid}])
     .select()
     .single();
 
