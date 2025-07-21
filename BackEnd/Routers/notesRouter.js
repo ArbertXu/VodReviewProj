@@ -20,7 +20,7 @@ router.post("/vod_comments", async(req, res) => {
 
     const {data, error} = await supabase
     .from("vod_comments")
-    .insert([{vod_id, timestamp_seconds, comments, created_at, uuid}])
+    .insert([{vod_id, timestamp_seconds, comments, created_at, user_id: uuid}])
     .select()
     .single();
 
