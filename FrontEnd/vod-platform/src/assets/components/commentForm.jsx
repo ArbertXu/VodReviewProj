@@ -1,12 +1,33 @@
 import { useState, useEffect } from "react";
-
-export default function CommentSection({ vod, canComment = true, isCoach = false, uploaderName, uploaderIMG, variant = "card", }) {
+ import { getAuth, onAuthStateChanged } from "firebase/auth";
+export default function CommentSection({ vod, canComment, uploaderName, uploaderIMG, variant = "card", }) {
   const [commentText, setCommentText] = useState("");
   const [currentTime, setCurrentTime] = useState(0);
   const [videoRef, setVideoRef] = useState(null);
   const [comments, setComments] = useState([]);
+  const [userID, setUserID] = useState(null);
+  const [isCoach, setIsCoach] = useState(false);
+  useEffect(() => {
+    const storedUserID = sessionStorage.getItem("user_id");
+    if (storedUserID) {
+      setUserID(storedUserID);
+    }
+  }, []);
 
-  
+  useEffect(() => {
+      if (!userID) return;
+      fetch(`${import.meta.env.VITE_API_URL}/api/user/${userID}`)
+      .then((res) => res.json())
+      .then((data) => {
+          if (data.role == "coach") {
+            setIsCoach(true);
+          }
+      })
+      .catch((err) => {
+          console.error("Failed to get data:", err)
+      });
+
+  }, [userID]);
 
   useEffect(() => {
     fetchComments();
@@ -23,10 +44,36 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
     }
   }
 
+  const profanityCheck = async (text) => {
+    try {
+      const res = await fetch('https://vector.profanity.dev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text }),
+      })
+
+      const data = await res.json()
+      console.log(data);
+      return data;
+    } catch (err) {
+      console.log("Error getting profanity:", err)
+      return {isProfanity: false };
+    }
+  }
+
   const handleSubmitComment = async () => {
+    
     if (!commentText.trim()) return;
+    
+    const profanity = await profanityCheck(commentText);
+
+    if (profanity.isProfanity) {
+      alert('Your comment contains inappropriate language. Please revise and try again.');
+      return;
+    } 
 
     try {
+      console.log(userID)
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/vod_comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -35,6 +82,7 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
           timestamp_seconds: currentTime,
           comments: commentText,
           created_at: new Date().toISOString(),
+          user_id: userID,
         }),
       });
 
@@ -80,14 +128,14 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
           <span>{uploaderName}</span>
         </div>
       )}
-      <div className={`${variant === "page"  ? "flex justify-center w-full" : ""}`}>
+      <div className={` flex justify-center items-center ${variant === "page"  ? " w-full" : ""}`}>
       <video
         controls
         onTimeUpdate={handleTimeUpdate}
         ref={(ref) => setVideoRef(ref)}
-        className={` rounded-md ${variant === "page"
+        className={` rounded-md  ${variant === "page"
           ? " w-full" 
-          :""
+          :"h-50"
         }`}
       >
         <source src={vod.url} type="video/mp4" />
@@ -95,12 +143,24 @@ export default function CommentSection({ vod, canComment = true, isCoach = false
       </div>
       <div className="mt-2 flex flex-col flex-grow">
         <p className="font-semibold mb-1 text-xs">Comments:</p>
-        <div className={`space-y-2 ${variant === "page" ? "" : " h-10 overflow-y-auto"}`}>
+        <div className={`space-y-2 ${variant === "page" ? "" : " h-10 max-h-10 overflow-y-auto"}`}>
           {comments.length > 0 ? (
             comments.map((c, i) => (
               <div key={i} className="bg-gray-800 p-1 rounded">
+                <div className="flex flex-row items-center justify-center">
+                  {c.user_data?.profile_img_url && (
+                    <img 
+                  src={c.user_data.profile_img_url}
+                  className="w-5 h-5 rounded-full object-cover pr-1"
+                  />
+                  )}
+                  {c.user_data?.username && (
+                    <p>{c.user_data.username}</p>
+                  )}
+                  
+                </div>
+                 <p>{c.comments}</p>
                 <p className="text-green-400 cursor-pointer hover:underline" onClick={() => seekTime(c.timestamp_seconds)}>{formatTimestamp(c.timestamp_seconds)} </p>
-                <p>{c.comments}</p>
               </div>
             ))
           ) : (

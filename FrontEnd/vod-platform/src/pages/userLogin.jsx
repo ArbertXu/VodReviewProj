@@ -16,6 +16,7 @@ function UserLogin() {
     e.preventDefault();
     setError(null);
     try {
+      console.log("Logging in with", formData.email, formData.password);
       const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
       const token = await userCredential.user.getIdToken();
 
@@ -29,26 +30,24 @@ function UserLogin() {
     const data = await response.json();
 
     if (response.ok) {
-      alert("Login successful and protected route accessed!");
+      alert("Login successful!");
       console.log("Protected response:", data);
-      // const uid = userCredential.user.uid;
-      // sessionStorage.setItem("user_id", uid);
-
+      navigate("/");
     } else {
       alert("Failed to access protected route: " + data.error);
     }
 
     } catch (err) {
-      setError(err.message);
+      setError("Login error. Incorrect password or email.")
     }
   };
 
   return (
     <>
     <Dashboard/>
-     <div className="flex items-center justify-center min-h-screen">
+     <div className="flex justify-center min-h-screen">
             <div className="w-full max-w-md p-4">
-            <h2 className="text-white text-center text-2xl mb-4">User Login</h2>
+            <h2 className="text-white text-center text-2xl mb-4 pt-20">User Login</h2>
             <form
                 onSubmit={handleSubmit}
                 className="card shadow-xl p-6 space-y-4 text-white"
@@ -67,7 +66,7 @@ function UserLogin() {
                 className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1"
                 onChange={handleChange}
                 />
-                <button type="submit" onClick={() => navigate("/")} className="btn bg-blue-500 hover:bg-blue-700 w-full">
+                <button type="submit"  className="btn bg-blue-500 hover:bg-blue-700 w-full">
                 Login
                 </button>
                 <div className="flex justify-evenly text-sm pt-2">
@@ -75,12 +74,12 @@ function UserLogin() {
                     <div className="flex">
                     <button
                         type="button"
-                        onClick={() => navigate("/registration/user")}
                         className="btn btn-outline btn-sm hover:bg-gray-500"
                     >
                         Sign Up
                     </button>
                     </div>
+                    {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
                 </div>
             </form>
             </div>
