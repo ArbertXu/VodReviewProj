@@ -131,9 +131,10 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
       <div className={` flex justify-center items-center ${variant === "page"  ? " w-full" : ""}`}>
       <video
         controls
+        controlsList="nodownload"
         onTimeUpdate={handleTimeUpdate}
         ref={(ref) => setVideoRef(ref)}
-        className={` rounded-md  ${variant === "page"
+        className={` rounded-md border border-gray-700 shadow-md  ${variant === "page"
           ? " w-full" 
           :"h-50"
         }`}
@@ -143,7 +144,7 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
       </div>
       <div className="mt-2 flex flex-col flex-grow">
         <p className="font-semibold mb-1 text-xs">Comments:</p>
-        <div className={`space-y-2 ${variant === "page" ? "" : " h-10 max-h-10 overflow-y-auto"}`}>
+        <div className={`space-y-2 ${variant === "page" ? "" : " h-15 max-h-15 overflow-y-auto"}`}>
           {comments.length > 0 ? (
             comments.map((c, i) => (
               <div key={i} className="bg-gray-800 p-1 rounded">
@@ -151,7 +152,7 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
                   {c.user_data?.profile_img_url && (
                     <img 
                   src={c.user_data.profile_img_url}
-                  className="w-5 h-5 rounded-full object-cover pr-1"
+                  className=" size-5 rounded-full object-cover mr-1"
                   />
                   )}
                   {c.user_data?.username && (

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Dashboard from "../assets/components/dashboard";
+import { ToastContainer, toast } from 'react-toastify'; 
 function UserRegistration() {
     const navigate = useNavigate();
     const[formData, setFormData] = useState({
@@ -24,13 +25,14 @@ function UserRegistration() {
             })
             const data = await response.json();
             if (response.ok) {
-                alert("User registered successfully!")
-                navigate("/")
+                toast.success("Logged in Successfully!", {
+                        onClose: () => navigate("/"),
+                      });
             } else {
-                alert ("ERROR: " + data.error)
+                toast.error("ERROR: " + data.error)
             }
         } catch (err) {
-            alert ("Request failed: " + err.message)
+            toast.error("Request failed: " + err.message);
         }
     }
 
@@ -49,21 +51,21 @@ function UserRegistration() {
                 type="text"
                 name="username"
                 placeholder="Username"
-                className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1"
+                className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1 transition duration-300"
                 onChange={handleChange}
                 />
                 <input
                 type="email"
                 name="email"
                 placeholder="Email"
-                className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1"
+                className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1 transition duration-300"
                 onChange={handleChange}
                 />
                 <input
                 type="password"
                 name="password"
                 placeholder="Password"
-                className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1"
+                className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1 transition duration-300"
                 onChange={handleChange}
                 />
                 <input
@@ -80,7 +82,7 @@ function UserRegistration() {
                 <label htmlFor="coachCheckbox" className="p-1">
                     Register as Coach
                 </label>
-                <button type="submit" className="btn bg-blue-500 hover:bg-blue-700 w-full">
+                <button type="submit" className="btn bg-teal-500 hover:bg-teal-700 w-full transition duration-200">
                 Register
                 </button>
                 <div className="flex flex-wrap items-center justify-evenly gap-2 text-sm pt-2">
@@ -88,17 +90,10 @@ function UserRegistration() {
                     <div className="flex gap-2">
                     <button
                         type="button"
-                        onClick={() => navigate("/login/coach")}
-                        className="btn btn-outline btn-sm hover:bg-gray-600"
-                    >
-                        Login as Coach
-                    </button>
-                    <button
-                        type="button"
                         onClick={() => navigate("/login/user")}
-                        className="btn btn-outline btn-sm hover:bg-gray-600"
+                        className="btn btn-outline btn-sm hover:bg-gray-600 pl-1 pr-1 rounded transition duration-200"
                     >
-                        Login as User
+                        Login
                     </button>
                     </div>
                 </div>

@@ -4,7 +4,7 @@ import { href } from 'react-router-dom'
 import { getAuth, signOut } from 'firebase/auth'
 import { useNavigate } from "react-router-dom";
 import {useState, useEffect} from "react";
-
+import { ToastContainer, toast } from 'react-toastify'; 
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -28,7 +28,6 @@ const unsubscribe = auth.onAuthStateChanged((user) => {
     sessionStorage.removeItem("user_id")
     setUserID(null)
     setUserData(null)
-    
   }
   });
 
@@ -59,9 +58,10 @@ const unsubscribe = auth.onAuthStateChanged((user) => {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      alert("You have logged out!");
-      sessionStorage.clear()
-      navigate("/")
+      sessionStorage.clear();
+      toast.success("Logged in Successfully!", {
+              onClose: () => navigate("/"),
+            });
     } catch (err) {
       console.error("Error signing out", err)
     }
@@ -88,7 +88,7 @@ const unsubscribe = auth.onAuthStateChanged((user) => {
                     aria-current={item.current ? 'page' : undefined}
                     className={classNames(
                       item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                      'rounded-md px-3 py-2 text-sm font-medium',
+                      'rounded-md px-3 py-2 text-sm font-medium transition duration-200',
                     )}
                   >
                     {item.name}
@@ -110,7 +110,7 @@ const unsubscribe = auth.onAuthStateChanged((user) => {
             {/* Profile dropdown */}
             <Menu as="div" className="relative ml-3">
               <div>
-                <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
+                <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden transition duration-200">
                   <span className="absolute -inset-1.5" />
                   <span className="sr-only">Open user menu</span>
                   <img
@@ -127,7 +127,7 @@ const unsubscribe = auth.onAuthStateChanged((user) => {
                 <MenuItem>
                   <a
                     href={`/profile/${userID}`}
-                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden transition duration-200"
                   >
                     Your Profile
                   </a>
@@ -142,7 +142,7 @@ const unsubscribe = auth.onAuthStateChanged((user) => {
                 </MenuItem>
                 { isLoggedIn && (
                   <MenuItem >
-                  <button onClick={handleSignOut} className='block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden w-full'>
+                  <button onClick={handleSignOut} className='block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden w-full transition duration-200'>
                     Sign Out
                   </button>
                 </MenuItem>

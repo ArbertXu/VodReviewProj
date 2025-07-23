@@ -12,32 +12,36 @@ export default function UploadForm({ onSubmit, uploading, onFileChange}) {
 
   return (
     <form
-      onSubmit={onSubmit}
-      className="space-y-4 flex flex-col items-center text-white"
-    >
-      <input
-        type="file"
-        accept="video/*"
-        ref={fileInputRef}
-        className="hidden"
-        onChange={handleInternalChange}
-      />
+  onSubmit={onSubmit}
+  className="space-y-6 w-full max-w-md mx-auto p-6 bg-[#111] rounded-2xl shadow-lg border border-gray-700"
+>
+  <input
+    type="file"
+    accept="video/*"
+    ref={fileInputRef}
+    className="hidden"
+    onChange={handleInternalChange}
+  />
 
-      <button
-        type="button"
-        onClick={() => fileInputRef.current?.click()}
-        className="bg-gray-700 px-4 py-2 rounded hover:bg-gray-800"
-      >
-        {filename ? `Selected: ${filename}` : "Choose Video File"}
-      </button>
+  <button
+    type="button"
+    onClick={() => fileInputRef.current?.click()}
+    className="w-full bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg transition duration-200 text-sm font-medium"
+  >
+    {filename ? ` Selected: ${filename}` : " Choose Video File"}
+  </button>
 
-      <button
-        type="submit"
-        disabled={uploading}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        {uploading ? "Uploading..." : "Upload VOD"}
-      </button>
-    </form>
+  <button
+    type="submit"
+    disabled={uploading}
+    className={`w-full ${
+      uploading
+        ? "bg-teal-400 cursor-not-allowed"
+        : "bg-teal-600 hover:bg-teal-700"
+    } text-white py-2 px-4 rounded-lg transition duration-200 text-sm font-semibold`}
+  >
+    {uploading ? "Uploading..." : " Upload VOD"}
+  </button>
+</form>
   );
 }
