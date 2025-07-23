@@ -15,6 +15,11 @@ export default function VodTest() {
   const [error, setError] = useState('');
   const ffmpegRef = useRef(null);
 
+  const getProgressColor = (progress) => {
+    if (progress < 30) return 'bg-red-100 border-red-400 text-red-700';
+    if (progress < 70) return 'bg-yellow-100 border-yellow-400 text-yellow-700';
+    return 'bg-green-100 border-green-400 text-green-700';
+  };
   useEffect(() => {
     const initFFmpeg = async () => {
       if (!ffmpegRef.current) {
@@ -197,10 +202,22 @@ export default function VodTest() {
       )}
 
       {uploading && (
-        <div className="mb-4 p-3 bg-blue-100 border border-blue-400 text-blue-700 rounded">
-          Processing video: {uploadProgress}%
+      <div className={`mb-4 p-3 border rounded transition-colors duration-500 ${getProgressColor(uploadProgress)}`}>
+        <div className="flex justify-between items-center mb-2">
+          <span>Processing video: {uploadProgress}%</span>
         </div>
-      )}
+        <div className="w-full bg-white bg-opacity-30 rounded-full h-2">
+          <div 
+            className="h-2 rounded-full transition-all duration-300"
+            style={{ 
+              width: `${uploadProgress}%`,
+              backgroundColor: uploadProgress < 30 ? '#dc2626' : 
+                            uploadProgress < 70 ? '#d97706' : '#059669'
+            }}
+          />
+        </div>
+      </div>
+    )}
       <UploadForm
         buttonText="Submit VOD"
         fileLabel="Upload your match clip"

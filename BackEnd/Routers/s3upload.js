@@ -5,7 +5,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
-
+const supabase = require("../database");
 require("dotenv").config();
 
 const router = express.Router();
@@ -34,6 +34,43 @@ router.post("/get-upload-url", async (req,res) => {
     console.error("Error generating signed URL", err);
     res.status(500).json({error: "COULDNT generate signed URL: "});
   }
+})
+
+router.delete("/delete-video/:vod_id", async (req,res) => {
+  const { vod_id } = req.params;
+  try {
+    const {data, error} = await supabase
+    .from("vods")
+    .select("*")
+    .eq("vod_id", vod_id)
+    .single()
+
+    if(error || !data ) {
+      console.error("error retrieving vod:", error);
+      return res.status(500).send("Error retrieving vod");
+    }
+    const s3key = data.s3_key;
+    const deleteParams = {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: s3key,
+    }
+    await s3.deleteObject(deleteParams).promise();
+
+    const {error: deleteError} = await supabase
+    .from("vods")
+    .delete()
+    .eq("vod_id", vod_id)
+
+    if(deleteError) {
+      console.error("Error deleting from db:", deleteError);
+      return res.status(500).json({error: "Failed to delete from db"});
+    }
+    res.status(200).json({message: "video deleted successfully"})
+  } catch (err) {
+    console.error("Error deleting video:", err)
+    res.status(500).json({error: "interal service error"})
+  }
+  
 })
 
 // router.post("/upload", upload.single("video"), async (req, res) => {

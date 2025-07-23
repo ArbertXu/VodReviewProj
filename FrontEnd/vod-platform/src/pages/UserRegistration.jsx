@@ -38,9 +38,9 @@ function UserRegistration() {
     return (
         <>
         <Dashboard/>
-        <div className="flex items-center justify-center min-h-screen">
+        <div className="flex justify-center min-h-screen">
             <div className="w-full max-w-md p-4">
-            <h2 className="text-white text-center text-2xl mb-4">User Registration</h2>
+            <h2 className="text-white text-center text-2xl mb-4 pt-20">User Registration</h2>
             <form
                 onSubmit={handleSubmit}
                 className="card shadow-xl p-6 space-y-4 text-white"
