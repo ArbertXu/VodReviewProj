@@ -5,6 +5,7 @@ import UploadForm from "../assets/components/UploadFile";
 import { Link } from "react-router-dom";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { ToastContainer, toast } from 'react-toastify'; 
 export default function VodTest() {
   const [vods, setVods] = useState([]);
   const [file, setFile] = useState(null);
@@ -20,6 +21,26 @@ export default function VodTest() {
     if (progress < 70) return 'bg-yellow-100 border-yellow-400 text-yellow-700';
     return 'bg-green-100 border-green-400 text-green-700';
   };
+
+   const handleDelete = async (vod_id) => {
+        if(!window.confirm("Are you sure you want to delete this vod?")) return;
+
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/delete-video/${vod_id}`, {
+                method: "DELETE",
+            })
+        if (!res.ok) {
+            const err = await res.json()
+            toast.success("Video Failed to delete");
+            return;
+        }
+        toast.error("Video Successfully deleted!");
+        setVods((prev) => prev.filter((v) => v.vod_id !== vod_id))
+        } catch (err) {
+            console.error("ERROR deleting video:", err);
+            toast.error("Error Deleting Video");
+        }
+    }
   useEffect(() => {
     const initFFmpeg = async () => {
       if (!ffmpegRef.current) {
@@ -229,9 +250,22 @@ export default function VodTest() {
       <h1 className="text-2xl p-5 text-white">Your VODS</h1>
       <div className="flex flex-wrap gap-4">
             {vods.map((vod) => (
+              
+              <div key={vod.vod_id} className="relative">
+                <button
+                  className="absolute top-1 right-1 bg-red-800 hover:bg-red-500 text-white text-[10px]  rounded-full z-10 shadow-md transition duration-200"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleDelete(vod.vod_id)}}
+                >
+                  X
+                </button>
               <Link key={vod.vod_id} to={`/vod/${vod.vod_id}`}>
                  <CommentSection vod={vod} canComment={false}/>
               </Link>
+               
+              </div>
+              
             ))}
       </div> 
     </div>

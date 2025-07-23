@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { auth, signInWithEmailAndPassword } from "../firebaseAuth";
 import { useNavigate } from "react-router-dom";
 import Dashboard from "../assets/components/dashboard";
+import { ToastContainer, toast } from 'react-toastify'; 
 function UserLogin() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
-  
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value });
     e.preventDefault()
@@ -30,9 +30,12 @@ function UserLogin() {
     const data = await response.json();
 
     if (response.ok) {
-      alert("Login successful!");
+      // alert("Login successful!");
+      toast.success("Logged in Successfully!", {
+        onClose: () => navigate("/"),
+      });
       console.log("Protected response:", data);
-      navigate("/");
+      // navigate("/");
     } else {
       alert("Failed to access protected route: " + data.error);
     }
@@ -66,7 +69,7 @@ function UserLogin() {
                 className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1"
                 onChange={handleChange}
                 />
-                <button type="submit"  className="btn bg-blue-500 hover:bg-blue-700 w-full">
+                <button type="submit"  className="btn bg-teal-500 hover:bg-teal-700 w-full transition duration-200">
                 Login
                 </button>
                 <div className="flex justify-evenly text-sm pt-2">
@@ -74,13 +77,14 @@ function UserLogin() {
                     <div className="flex">
                     <button
                         type="button"
-                        className="btn btn-outline btn-sm hover:bg-gray-500"
+                        className="btn btn-outline btn-sm hover:bg-gray-500 transition duration-200 rounded pl-1 pr-1"
+                        onClick={() => navigate("/registration/user")}
                     >
                         Sign Up
                     </button>
                     </div>
-                    {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
                 </div>
+                {error && <p className="text-red-500 text-sm">{error}</p>}
             </form>
             </div>
         </div>

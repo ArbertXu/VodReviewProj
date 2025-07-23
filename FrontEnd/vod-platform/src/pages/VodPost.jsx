@@ -13,6 +13,8 @@ export default function VodPost() {
         .then((data) => setVod(data))
         .catch((err) => console.error("Failed to get vod:", err))
     }, [vod_id])
+
+   
     if (!Vod) return <p className="text-white">Loading VOD...</p>;
     return (
         <>
