@@ -122,7 +122,7 @@ router.post("/user/profile-image", async (req, res) => {
 router.post("/user/:user_id/role", async (req, res) => {
   const {user_id} = req.params
   const {role} = req.body
-  const (data, error) = await supabase
+  const {data, error} = await supabase
     .from("user_data")
     .update({role})
     .eq("firebase_id", user_id)
