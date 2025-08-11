@@ -119,6 +119,22 @@ router.post("/user/profile-image", async (req, res) => {
   res.status(200).json(data);
 })
 
+router.put("/user/:user_id/role", async (req, res) => {
+  const {user_id} = req.params
+  const {role} = req.body
+  const {data, error} = await supabase
+    .from("user_data")
+    .update({role})
+    .eq("firebase_id", user_id)
+    .select()
+    .single();
+  
+  if (error) {
+    console.error("Error updating user role:", error);
+    return res.status(500).json({error: "Failed to update error"});
+  }
+  res.status(200).json(data);
+})
 
 
 module.exports = router;

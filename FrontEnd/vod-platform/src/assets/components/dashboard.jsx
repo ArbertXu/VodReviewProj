@@ -59,7 +59,7 @@ const unsubscribe = auth.onAuthStateChanged((user) => {
     try {
       await signOut(auth);
       sessionStorage.clear();
-      toast.success("Logged in Successfully!", {
+      toast.success("Signed out successfully!", {
               onClose: () => navigate("/"),
             });
     } catch (err) {
@@ -134,7 +134,7 @@ const unsubscribe = auth.onAuthStateChanged((user) => {
                 </MenuItem>
                 <MenuItem>
                   <a
-                    href="#"
+                    href={`/settings/${userID}`}
                     className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                   >
                     Settings

@@ -180,9 +180,9 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
               onChange={(e) => setCommentText(e.target.value)}
             />
             <button
-              className={`mt-1 w-full px-2 py-1 rounded text-xs ${
+              className={`mt-1 w-full px-2 py-1 rounded text-xs transition duration-200 ${
                 isCoach
-                  ? "bg-green-600 hover:bg-green-700"
+                  ? "bg-teal-600 hover:bg-teal-700"
                   : "bg-gray-500 opacity-50 cursor-not-allowed"
               }`}
               disabled={!isCoach}
