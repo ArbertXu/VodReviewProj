@@ -100,7 +100,7 @@ export default function ProfilePage()
                     <button
                     type="button"
                     onClick={handleImageUpload}
-                    className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
+                    className="bg-teal-600 px-4 py-2 rounded hover:bg-teal-700 transition duration-200"
                     >
                     Submit New Picture
                     </button>

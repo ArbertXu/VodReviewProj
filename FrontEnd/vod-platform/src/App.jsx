@@ -10,6 +10,7 @@ import Explore from './pages/ExplorePage'
 import ErrPage from './pages/404'
 import ProfilePage from "./pages/profile"
 import VodPost from "./pages/VodPost"
+import Settings from "./pages/settings"
 import { ToastContainer, toast } from 'react-toastify'; 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
           <Route path='*' element={<ErrPage/>}></Route>
           <Route path="/profile/:userID" element={<ProfilePage />} />
           <Route path="/vod/:vod_id" element={<VodPost/>} />
+          <Route path="/settings/:userID" element={<Settings/>} />
         </Routes>
         <ToastContainer/>
       </div>
