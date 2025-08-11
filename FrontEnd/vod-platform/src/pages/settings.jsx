@@ -34,6 +34,7 @@ export default function Settings()
     const handleSave = async () => {
         try {
             const res = await fetch
+            
             (`${import.meta.env.VITE_API_URL}/api/user/${userID}/role`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
