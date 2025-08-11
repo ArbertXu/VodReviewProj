@@ -119,7 +119,7 @@ router.post("/user/profile-image", async (req, res) => {
   res.status(200).json(data);
 })
 
-router.post("/user/:user_id/role", async (req, res) => {
+router.put("/user/:user_id/role", async (req, res) => {
   const {user_id} = req.params
   const {role} = req.body
   const {data, error} = await supabase
