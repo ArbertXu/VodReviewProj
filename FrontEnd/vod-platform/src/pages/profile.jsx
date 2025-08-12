@@ -51,8 +51,10 @@ export default function ProfilePage()
 
             const updateRes = await fetch(`${import.meta.env.VITE_API_URL}/api/user/profile-image`, {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({user_id: userID, profile_img_url: publicURL}),
+                headers: {"Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ profile_img_url: publicURL}),
             })
             const updatedUser = await updateRes.json();
             setUserData(updatedUser)

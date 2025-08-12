@@ -18,7 +18,7 @@ function UserLogin() {
     try {
       console.log("Logging in with", formData.email, formData.password);
       const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      const token = await userCredential.user.getIdToken();
+      const token = await userCredential.user.getIdToken(); 
 
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/protected`, {
       method: "GET",

@@ -6,11 +6,14 @@ import { Link } from "react-router-dom";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import { ToastContainer, toast } from 'react-toastify'; 
+import {auth} from "../firebaseAuth";
 export default function VodTest() {
   const [vods, setVods] = useState([]);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [userID, setUserID] = useState(null);
+  const user = auth.currentUser;
+  const token = await user.getIDToken();
   const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState('');
@@ -192,12 +195,13 @@ export default function VodTest() {
 
        const metadataRes = await fetch(`${import.meta.env.VITE_API_URL}/api/vods`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+           },
           body: JSON.stringify({
             url: publicURL,
             s3_key: fileKey,
             date_uploaded: new Date().toISOString(),
-            user_id: userID,
           }),
         });
 
