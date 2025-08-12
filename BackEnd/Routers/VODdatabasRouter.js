@@ -119,7 +119,7 @@ router.post("/user/profile-image", verifyFirebaseToken, async (req, res) => {
   res.status(200).json(data);
 })
 
-router.put("/user/:user_id/password")
+// router.put("/user/:user_id/password")
 
 router.put("/user/:user_id/role", async (req, res) => {
   const {user_id} = req.params
