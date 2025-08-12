@@ -60,6 +60,7 @@ const unsubscribe = auth.onAuthStateChanged((user) => {
       await signOut(auth);
       sessionStorage.clear();
       toast.success("Signed out successfully!", {
+              autoClose: 500,
               onClose: () => navigate("/"),
             });
     } catch (err) {

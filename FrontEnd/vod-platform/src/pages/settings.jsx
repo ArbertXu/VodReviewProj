@@ -51,7 +51,12 @@ export default function Settings()
         }
     }
 
-    
+    if(!userData) return (
+            <>
+            <Dashboard/>
+            <p className="text-white">LOGIN</p>
+            </>
+            );
     return (
   <>
     <Dashboard />

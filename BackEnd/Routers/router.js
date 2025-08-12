@@ -21,7 +21,7 @@ router.post("/register", async (req, res) => {
                 firebase_id: user.uid,
                 email,
                 username,
-                profile_img_url: "https://picsum.photos/200/200",
+                profile_img_url: "https://vod-review-proj.vercel.app/Images/DefaultPFP.jpg",
                 role,
                 created_at: new Date().toISOString(),
             }

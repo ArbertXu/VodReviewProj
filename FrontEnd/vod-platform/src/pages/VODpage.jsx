@@ -31,10 +31,10 @@ export default function VodTest() {
             })
         if (!res.ok) {
             const err = await res.json()
-            toast.success("Video Failed to delete");
+            toast.error("Video Failed to delete");
             return;
         }
-        toast.error("Video Successfully deleted!");
+        toast.success("Video Successfully deleted!");
         setVods((prev) => prev.filter((v) => v.vod_id !== vod_id))
         } catch (err) {
             console.error("ERROR deleting video:", err);

@@ -32,6 +32,7 @@ function UserLogin() {
     if (response.ok) {
       // alert("Login successful!");
       toast.success("Logged in Successfully!", {
+        autoClose: 500,
         onClose: () => navigate("/"),
       });
       console.log("Protected response:", data);
