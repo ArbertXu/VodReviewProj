@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const supabase = require("../database")
-
+const verifyFirebaseToken = require("../Routers/authmiddleware")
 router.get("/explore", async (req, res) => {
   const {data, error} = await supabase.from("vods").select(`*, user_data(username, profile_img_url)`);
   if (error) {
@@ -76,12 +76,12 @@ router.get("/vods/id/:vod_id", async (req, res) => {
   res.json(data);
 })
 
-router.post("/vods", async (req, res) => {
-  const { url, user_id: firebase_id, date_uploaded, s3_key } = req.body;
+router.post("/vods", verifyFirebaseToken, async (req, res) => {
+  const { url, date_uploaded, s3_key } = req.body;
   const { data: userData, error: userError } = await supabase
   .from("user_data")
   .select("id")
-  .eq("firebase_id", firebase_id)
+  .eq("firebase_id", req.uid)
   .single();
 
   if (userError || !userData) {
@@ -103,12 +103,12 @@ router.post("/vods", async (req, res) => {
   res.status(201).json(data);
 });
 
-router.post("/user/profile-image", async (req, res) => {
-  const { user_id, profile_img_url} = req.body
+router.post("/user/profile-image", verifyFirebaseToken, async (req, res) => {
+  const { profile_img_url } = req.body
   const { data, error } = await supabase
       .from("user_data")
       .update({ profile_img_url })
-      .eq("firebase_id", user_id)
+      .eq("firebase_id", req.uid)
       .select()
       .single();
 
@@ -118,6 +118,8 @@ router.post("/user/profile-image", async (req, res) => {
   }
   res.status(200).json(data);
 })
+
+router.put("/user/:user_id/password")
 
 router.put("/user/:user_id/role", async (req, res) => {
   const {user_id} = req.params
