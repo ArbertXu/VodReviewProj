@@ -14,9 +14,9 @@ router.get("/explore", async (req, res) => {
   res.json(data);
 });
 
-router.get("/user/:user_id", async(req, res) => {
-  const { user_id } = req.params;
-  if(user_id == "null") {
+router.get("/user", verifyFirebaseToken,  async(req, res) => {
+  const user_id  = req.uid;
+  if(!user_id) {
     return res.status(400).json({error: "LOGIN"})
   }
    const {data: userData, error: userError} = await supabase.from("user_data")
