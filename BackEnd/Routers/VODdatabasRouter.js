@@ -105,13 +105,13 @@ router.post("/vods", verifyFirebaseToken, async (req, res) => {
 
 router.post("/user/profile-image", verifyFirebaseToken, async (req, res) => {
   const { profile_img_url } = req.body
+  console.log(req.uid)
   const { data, error } = await supabase
       .from("user_data")
       .update({ profile_img_url })
       .eq("firebase_id", req.uid)
       .select()
       .single();
-
   if(error) {
     console.error("Error changing pfp url:", error);
     return res.status(500).json({error: "Failed to upload image url "});
