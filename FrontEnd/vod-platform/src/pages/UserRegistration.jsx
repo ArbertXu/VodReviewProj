@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Dashboard from "../assets/components/dashboard";
 import { ToastContainer, toast } from 'react-toastify'; 
+import { auth, signInWithEmailAndPassword } from "../firebaseAuth";
 function UserRegistration() {
     const navigate = useNavigate();
     const[formData, setFormData] = useState({
@@ -25,7 +26,9 @@ function UserRegistration() {
             })
             const data = await response.json();
             if (response.ok) {
-                toast.success("Logged in Successfully!", {
+                await signInWithEmailAndPassword(auth, formData.email, formData.password)
+                toast.success("Registered successfully and logged in!", {
+                        autoClose: 2000,
                         onClose: () => navigate("/"),
                       });
             } else {
