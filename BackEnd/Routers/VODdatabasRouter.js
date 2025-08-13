@@ -17,14 +17,14 @@ router.get("/explore", async (req, res) => {
 router.get("/user", verifyFirebaseToken,  async(req, res) => {
   const user_id  = req.uid;
   if(!user_id) {
-    return res.status(400).json({error: "LOGIN"})
+    return res.status(401).json({error: "LOGIN"})
   }
    const {data: userData, error: userError} = await supabase.from("user_data")
   .select("*").eq("firebase_id", user_id).single();
   
   if (userError || !userData) {
     console.error("Could not find user UUID:", userError);
-    return res.status(400).json({ error: "User not found" });
+    return res.status(404).json({ error: "User not found" });
   }
   console.log("UserData recieved", userData);
   res.json(userData)
