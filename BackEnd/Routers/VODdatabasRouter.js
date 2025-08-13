@@ -30,8 +30,8 @@ router.get("/user", verifyFirebaseToken,  async(req, res) => {
   res.json(userData)
 })
 
-router.get("/vods/user/:user_id", async(req, res) => {
-  const { user_id } = req.params;
+router.get("/vods/user", verifyFirebaseToken, async(req, res) => {
+  const user_id = req.uid;
 
   if (user_id == "null") {
     return res.status(400).json({error: "LOGIN"})
@@ -121,8 +121,8 @@ router.post("/user/profile-image", verifyFirebaseToken, async (req, res) => {
 
 // router.put("/user/:user_id/password")
 
-router.put("/user/:user_id/role", async (req, res) => {
-  const {user_id} = req.params
+router.put("/user/role", verifyFirebaseToken, async (req, res) => {
+  const user_id = req.params
   const {role} = req.body
   const {data, error} = await supabase
     .from("user_data")
