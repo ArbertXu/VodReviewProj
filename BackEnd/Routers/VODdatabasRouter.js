@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const supabase = require("../database")
 const verifyFirebaseToken = require("../Routers/authmiddleware")
+const admin = require("firebase-admin")
 router.get("/explore", async (req, res) => {
   const {data, error} = await supabase.from("vods").select(`*, user_data(username, profile_img_url)`);
   if (error) {
@@ -119,10 +120,30 @@ router.post("/user/profile-image", verifyFirebaseToken, async (req, res) => {
   res.status(200).json(data);
 })
 
-// router.put("/user/:user_id/password")
+router.put("/user/password", verifyFirebaseToken, async(req, res) => {
+  const user_id = req.uid;
+  try {
+    const {newPassword} = req.body;
+    await admin.auth().updateUser(uid, {
+      password: newPassword,
+    })
+
+    const {data, error} = await supabase.from("user_data").update({newPassword})
+    .eq("firebase_id", user_id)
+    .select()
+    .single();
+
+    if (error) {
+      console.error("Error changing password:", error);
+    }
+    return res.status(200).json(data)
+  } catch (error) {
+    return res.status(500).json({error: "Failed to update password"});
+  }
+})
 
 router.put("/user/role", verifyFirebaseToken, async (req, res) => {
-  const user_id = req.params
+  const user_id = req.uid
   const {role} = req.body
   const {data, error} = await supabase
     .from("user_data")
