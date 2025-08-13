@@ -13,7 +13,6 @@ export default function VodTest() {
   const [uploading, setUploading] = useState(false);
   const [userID, setUserID] = useState(null);
   const user = auth.currentUser;
-  const token = await user.getIDToken();
   const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState('');
@@ -116,7 +115,7 @@ export default function VodTest() {
       alert("Please select a video file and login");
       return;
     }
-
+    const token = await user.getIDToken();
     if (!ffmpegLoaded) {
       setError("Video processor not ready. Please wait and try again.");
       return;

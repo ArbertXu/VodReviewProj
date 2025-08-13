@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
- import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import {auth} from "/src/firebaseAuth.js";
 export default function CommentSection({ vod, canComment, uploaderName, uploaderIMG, variant = "card", }) {
   const [commentText, setCommentText] = useState("");
   const [currentTime, setCurrentTime] = useState(0);
@@ -7,6 +8,7 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
   const [comments, setComments] = useState([]);
   const [userID, setUserID] = useState(null);
   const [isCoach, setIsCoach] = useState(false);
+  const [user, setUser] = useState(false);
   useEffect(() => {
     const storedUserID = sessionStorage.getItem("user_id");
     if (storedUserID) {
@@ -14,20 +16,37 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
     }
   }, []);
 
-  useEffect(() => {
-      if (!userID) return;
-      fetch(`${import.meta.env.VITE_API_URL}/api/user/${userID}`)
-      .then((res) => res.json())
-      .then((data) => {
-          if (data.role == "coach") {
-            setIsCoach(true);
-          }
-      })
-      .catch((err) => {
-          console.error("Failed to get data:", err)
-      });
 
-  }, [userID]);
+  useEffect(() => {
+          const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+              setUser(firebaseUser);
+          })
+          return () => unsubscribe();
+      }, []);
+
+  useEffect(() => {
+      if (!userID || !user) return;
+      const fetchUserRole = async () => {
+          try {
+              const token = await user.getIdToken();
+              const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user`, {
+                  headers: {
+                      "Authorization": `Bearer ${token}`,
+                  },
+              });
+              if (!res.ok) {
+                  throw new Error(`HTTP error ${res.status}`);
+              }
+              const data = await res.json();
+              if (data.role === "coach") {
+                  setIsCoach(true);
+              }
+          } catch (err) {
+              console.error("Failed to get data:", err);
+          }
+      };
+      fetchUserRole();
+  }, [userID, user]);
 
   useEffect(() => {
     fetchComments();

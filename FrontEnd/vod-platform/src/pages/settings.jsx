@@ -1,12 +1,20 @@
 import Dashboard from "../assets/components/dashboard";
 import {useState, useEffect} from 'react';
-import {toast} from 'react-toastify'
+import {toast} from 'react-toastify';
+import {auth} from "/src/firebaseAuth.js";
 export default function Settings() 
 {
     const [role, setRole] = useState('user');
     const [userData, setUserData] = useState(null);
     const [userID, setUserID] = useState(null);
-    
+    const [user, setUser] = useState(null);
+    useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+        setUser(firebaseUser);
+    });
+    return () => unsubscribe();
+    }, []);
+
     useEffect(() => {
         const storedUserID = sessionStorage.getItem("user_id");
         if (storedUserID) {
@@ -14,22 +22,32 @@ export default function Settings()
         }
     }, []);   
     useEffect(() => {
-        if (!userID) return;
-        fetch(`${import.meta.env.VITE_API_URL}/api/user/${userID}`)
-        .then(async (res) => {
+    if (!userID) return;
+    const fetchUserRole = async () => {
+        try {
+            if(!user){
+                console.log("No user")
+                return;
+            }
+            const token = await user.getIdToken();
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
             if (!res.ok) {
                 throw new Error(`HTTP error ${res.status}`);
-            }   
-            return res.json();
-        })
-        .then((data) => {
-            setRole(data.role)
-        })
-        .catch((err) => {
-            console.error("Failed to get data:", err)
-        });
+            }
+            const data = await res.json();
+            setRole(data.role);
+        } catch (err) {
+        console.error("Failed to get data:", err);
+        }
+    };
 
-    }, [userID]);
+    fetchUserRole();
+    }, [user]);
+
 
     const handleSave = async () => {
         try {
