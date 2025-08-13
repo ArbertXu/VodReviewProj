@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const supabase = require("../database");
-
-router.post("/vod_comments", async(req, res) => {
-    const {vod_id, timestamp_seconds, comments, created_at, user_id} = req.body;
+const verifyFirebaseToken = require("../Routers/authmiddleware")
+router.post("/vod_comments", verifyFirebaseToken, async(req, res) => {
+    const {vod_id, timestamp_seconds, comments, created_at} = req.body;
+    const user_id = req.uid;
 
     const { data: userData, error: userError } = await supabase
         .from("user_data")
