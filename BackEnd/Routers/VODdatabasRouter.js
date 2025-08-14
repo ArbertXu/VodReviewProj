@@ -2,7 +2,8 @@
 const express = require("express");
 const router = express.Router();
 const supabase = require("../database")
-
+const verifyFirebaseToken = require("../Routers/authmiddleware")
+const admin = require("firebase-admin")
 router.get("/explore", async (req, res) => {
   const {data, error} = await supabase.from("vods").select(`*, user_data(username, profile_img_url)`);
   if (error) {
@@ -14,24 +15,24 @@ router.get("/explore", async (req, res) => {
   res.json(data);
 });
 
-router.get("/user/:user_id", async(req, res) => {
-  const { user_id } = req.params;
-  if(user_id == "null") {
-    return res.status(400).json({error: "LOGIN"})
+router.get("/user", verifyFirebaseToken,  async(req, res) => {
+  const user_id  = req.uid;
+  if(!user_id) {
+    return res.status(401).json({error: "LOGIN"})
   }
    const {data: userData, error: userError} = await supabase.from("user_data")
   .select("*").eq("firebase_id", user_id).single();
   
   if (userError || !userData) {
     console.error("Could not find user UUID:", userError);
-    return res.status(400).json({ error: "User not found" });
+    return res.status(404).json({ error: "User not found" });
   }
   console.log("UserData recieved", userData);
   res.json(userData)
 })
 
-router.get("/vods/user/:user_id", async(req, res) => {
-  const { user_id } = req.params;
+router.get("/vods/user", verifyFirebaseToken, async(req, res) => {
+  const user_id = req.uid;
 
   if (user_id == "null") {
     return res.status(400).json({error: "LOGIN"})
@@ -76,12 +77,12 @@ router.get("/vods/id/:vod_id", async (req, res) => {
   res.json(data);
 })
 
-router.post("/vods", async (req, res) => {
-  const { url, user_id: firebase_id, date_uploaded, s3_key } = req.body;
+router.post("/vods", verifyFirebaseToken, async (req, res) => {
+  const { url, date_uploaded, s3_key } = req.body;
   const { data: userData, error: userError } = await supabase
   .from("user_data")
   .select("id")
-  .eq("firebase_id", firebase_id)
+  .eq("firebase_id", req.uid)
   .single();
 
   if (userError || !userData) {
@@ -103,15 +104,15 @@ router.post("/vods", async (req, res) => {
   res.status(201).json(data);
 });
 
-router.post("/user/profile-image", async (req, res) => {
-  const { user_id, profile_img_url} = req.body
+router.post("/user/profile-image", verifyFirebaseToken, async (req, res) => {
+  const { profile_img_url } = req.body
+  console.log(req.uid)
   const { data, error } = await supabase
       .from("user_data")
       .update({ profile_img_url })
-      .eq("firebase_id", user_id)
+      .eq("firebase_id", req.uid)
       .select()
       .single();
-
   if(error) {
     console.error("Error changing pfp url:", error);
     return res.status(500).json({error: "Failed to upload image url "});
@@ -119,8 +120,30 @@ router.post("/user/profile-image", async (req, res) => {
   res.status(200).json(data);
 })
 
-router.put("/user/:user_id/role", async (req, res) => {
-  const {user_id} = req.params
+router.put("/user/username", verifyFirebaseToken, async(req, res) => {
+  const user_id = req.uid;
+  try {
+    const {newUserName} = req.body;
+    await admin.auth().updateUser(uid, {
+      password: newPassword,
+    })
+
+    const {data, error} = await supabase.from("user_data").update({newUserName})
+    .eq("firebase_id", user_id)
+    .select()
+    .single();
+
+    if (error) {
+      console.error("Error changing username:", error);
+    }
+    return res.status(200).json(data)
+  } catch (error) {
+    return res.status(500).json({error: "Failed to update username"});
+  }
+})
+
+router.put("/user/role", verifyFirebaseToken, async (req, res) => {
+  const user_id = req.uid
   const {role} = req.body
   const {data, error} = await supabase
     .from("user_data")

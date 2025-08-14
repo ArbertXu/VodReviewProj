@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { auth, signInWithEmailAndPassword } from "../firebaseAuth";
+import {getAuth, sendPasswordResetEmail} from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import Dashboard from "../assets/components/dashboard";
 import { ToastContainer, toast } from 'react-toastify'; 
@@ -7,6 +8,9 @@ function UserLogin() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
+  const [showResetForm, setShowResetForm] = useState(false);
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value });
     e.preventDefault()
@@ -18,7 +22,7 @@ function UserLogin() {
     try {
       console.log("Logging in with", formData.email, formData.password);
       const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      const token = await userCredential.user.getIdToken();
+      const token = await userCredential.user.getIdToken(); 
 
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/protected`, {
       method: "GET",
@@ -45,6 +49,17 @@ function UserLogin() {
       setError("Login error. Incorrect password or email.")
     }
   };
+
+  const handleReset = async (e) => {
+    e.preventDefault()
+    const auth = getAuth();
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setMessage("Password reset email sent! Check your inbox.");
+    } catch (error) {
+      setMessage("Error:" + error);
+    }
+  }
 
   return (
     <>
@@ -87,6 +102,15 @@ function UserLogin() {
                 </div>
                 {error && <p className="text-red-500 text-sm">{error}</p>}
             </form>
+             <div>
+                        
+                          <button
+                            className="btn btn-outline btn-sm hover:bg-gray-500 transition duration-200 rounded pl-1 pr-1 text-white"
+                            onClick={() => navigate("/forgot-password")}  
+                          >
+                            Forgot Password?
+                          </button>
+                    </div>
             </div>
         </div>
         </>

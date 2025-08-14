@@ -1,12 +1,22 @@
 import Dashboard from "../assets/components/dashboard";
 import {useState, useEffect} from 'react';
-import {toast} from 'react-toastify'
+import {toast} from 'react-toastify';
+import {auth} from "/src/firebaseAuth.js";
+import { useNavigate } from "react-router-dom";
 export default function Settings() 
 {
+    const navigate = useNavigate();
     const [role, setRole] = useState('user');
     const [userData, setUserData] = useState(null);
     const [userID, setUserID] = useState(null);
-    
+    const [user, setUser] = useState(null);
+    useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+        setUser(firebaseUser);
+    });
+    return () => unsubscribe();
+    }, []);
+
     useEffect(() => {
         const storedUserID = sessionStorage.getItem("user_id");
         if (storedUserID) {
@@ -14,34 +24,51 @@ export default function Settings()
         }
     }, []);   
     useEffect(() => {
-        if (!userID) return;
-        fetch(`${import.meta.env.VITE_API_URL}/api/user/${userID}`)
-        .then(async (res) => {
+    if (!userID) return;
+    const fetchUserRole = async () => {
+        try {
+            if(!user){
+                console.log("No user")
+                return;
+            }
+            const token = await user.getIdToken();
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
             if (!res.ok) {
                 throw new Error(`HTTP error ${res.status}`);
-            }   
-            return res.json();
-        })
-        .then((data) => {
-            setRole(data.role)
-        })
-        .catch((err) => {
-            console.error("Failed to get data:", err)
-        });
+            }
+            const data = await res.json();
+            setRole(data.role);
+        } catch (err) {
+        console.error("Failed to get data:", err);
+        }
+    };
 
-    }, [userID]);
+    fetchUserRole();
+    }, [user]);
+
+
 
     const handleSave = async () => {
         try {
+            const token = await user.getIdToken();
             const res = await fetch
             
-            (`${import.meta.env.VITE_API_URL}/api/user/${userID}/role`, {
+            (`${import.meta.env.VITE_API_URL}/api/user/role`, {
                     method: "PUT",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                     },
                     body: JSON.stringify({ role })
                 });
                 if (res.ok) {
-                    toast.success("Role updated!");
+                    toast.success("Role updated!", {
+                        autoClose: 500,
+                        onClose: () => navigate("/"),
+                    });
                 } else {
                     toast.error("Failed to update role");
                 }
@@ -51,7 +78,7 @@ export default function Settings()
         }
     }
 
-    if(!userData) return (
+    if(!userID) return (
             <>
             <Dashboard/>
             <p className="text-white">LOGIN</p>

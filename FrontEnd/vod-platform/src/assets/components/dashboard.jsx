@@ -2,6 +2,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { href } from 'react-router-dom'
 import { getAuth, signOut } from 'firebase/auth'
+import {auth} from "/src/firebaseAuth.js";
 import { useNavigate } from "react-router-dom";
 import {useState, useEffect} from "react";
 import { ToastContainer, toast } from 'react-toastify'; 
@@ -36,16 +37,33 @@ const unsubscribe = auth.onAuthStateChanged((user) => {
 
     useEffect(() => {
         if (!userID) return;
-        fetch(`${import.meta.env.VITE_API_URL}/api/user/${userID}`)
-        .then((res) => res.json())
-        .then((data) => {
-            setUserData(data)
-        })
-        .catch((err) => {
-            console.error("Failed to get data:", err)
-        });
-
-    }, [userID]);
+    
+        const fetchUserData = async () => {
+            try {
+            const user = auth.currentUser;
+            if (!user) return;
+    
+            const token = await user.getIdToken();
+    
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user`, {
+                headers: {
+                "Authorization": `Bearer ${token}`,
+                },
+            });
+    
+            if (!res.ok) {
+                throw new Error("Failed to fetch user data");
+            }
+    
+            const data = await res.json();
+            setUserData(data);
+            } catch (err) {
+            console.error("Failed to get data:", err);
+            }
+        };
+    
+        fetchUserData();
+      }, [userID]);
 
     const navigation = [
     { name: 'My VODS', href: '/VODS', show: isLoggedIn },
