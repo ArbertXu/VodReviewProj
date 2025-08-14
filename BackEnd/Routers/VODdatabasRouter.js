@@ -120,25 +120,25 @@ router.post("/user/profile-image", verifyFirebaseToken, async (req, res) => {
   res.status(200).json(data);
 })
 
-router.put("/user/password", verifyFirebaseToken, async(req, res) => {
+router.put("/user/username", verifyFirebaseToken, async(req, res) => {
   const user_id = req.uid;
   try {
-    const {newPassword} = req.body;
+    const {newUserName} = req.body;
     await admin.auth().updateUser(uid, {
       password: newPassword,
     })
 
-    const {data, error} = await supabase.from("user_data").update({newPassword})
+    const {data, error} = await supabase.from("user_data").update({newUserName})
     .eq("firebase_id", user_id)
     .select()
     .single();
 
     if (error) {
-      console.error("Error changing password:", error);
+      console.error("Error changing username:", error);
     }
     return res.status(200).json(data)
   } catch (error) {
-    return res.status(500).json({error: "Failed to update password"});
+    return res.status(500).json({error: "Failed to update username"});
   }
 })
 
