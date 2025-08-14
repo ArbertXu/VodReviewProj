@@ -2,8 +2,10 @@ import Dashboard from "../assets/components/dashboard";
 import {useState, useEffect} from 'react';
 import {toast} from 'react-toastify';
 import {auth} from "/src/firebaseAuth.js";
+import { useNavigate } from "react-router-dom";
 export default function Settings() 
 {
+    const navigate = useNavigate();
     const [role, setRole] = useState('user');
     const [userData, setUserData] = useState(null);
     const [userID, setUserID] = useState(null);
@@ -49,17 +51,24 @@ export default function Settings()
     }, [user]);
 
 
+
     const handleSave = async () => {
         try {
+            const token = await user.getIdToken();
             const res = await fetch
             
-            (`${import.meta.env.VITE_API_URL}/api/user/${userID}/role`, {
+            (`${import.meta.env.VITE_API_URL}/api/user/role`, {
                     method: "PUT",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                     },
                     body: JSON.stringify({ role })
                 });
                 if (res.ok) {
-                    toast.success("Role updated!");
+                    toast.success("Role updated!", {
+                        autoClose: 500,
+                        onClose: () => navigate("/"),
+                    });
                 } else {
                     toast.error("Failed to update role");
                 }

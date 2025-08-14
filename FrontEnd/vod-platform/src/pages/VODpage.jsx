@@ -12,7 +12,7 @@ export default function VodTest() {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [userID, setUserID] = useState(null);
-  const user = auth.currentUser;
+  const [user, setUser] = useState(null);
   const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState('');
@@ -24,6 +24,14 @@ export default function VodTest() {
     return 'bg-green-100 border-green-400 text-green-700';
   };
 
+
+  useEffect(() => {
+          const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+              setUser(firebaseUser);
+          })
+          return () => unsubscribe();
+      }, []);
+    
    const handleDelete = async (vod_id) => {
         if(!window.confirm("Are you sure you want to delete this vod?")) return;
 
@@ -74,19 +82,38 @@ export default function VodTest() {
       setUserID(storedUserID);
     }
   }, []);
-    useEffect(() => {
-        console.log(userID);    
-        if (userID === null) return;
-        fetch(`${import.meta.env.VITE_API_URL}/api/vods/user/${userID}`)
-        .then((res) => res.json())
-        .then((data) => {
+  useEffect(() => {
+    console.log("UserID:", userID);
+    if (!userID || !user) return;
+    
+    const fetchUserVods = async () => {
+        try {
+            const token = await user.getIdToken();
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/vods/user`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+            
+            if (!res.ok) {
+                throw new Error(`HTTP error ${res.status}`);
+            }
+            
+            const data = await res.json();
             console.log("Fetched VOD data:", data);
             setVods(data);
-        })
-        .catch((err) => console.error("Error fetching VODs:", err));
-    }, [userID]);
-    useEffect(() => {
-  console.log("VOD URLs:", vods.map(v => v.url));
+        } catch (err) {
+            console.error("Error fetching VODs:", err);
+        }
+    };
+
+    fetchUserVods();
+}, [userID, user]);
+
+useEffect(() => {
+    if (vods && vods.length > 0) {
+        console.log("VOD URLs:", vods.map(v => v.url));
+    }
 }, [vods]);
   
 

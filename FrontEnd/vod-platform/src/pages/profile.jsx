@@ -2,6 +2,7 @@ import Dashboard from "../assets/components/dashboard";
 import { useEffect, useState, useRef } from "react";
 import { getAuth } from "firebase/auth";
 import {auth} from "/src/firebaseAuth.js";
+import {toast} from 'react-toastify';
 export default function ProfilePage() 
 {   
     const [user, setUser] = useState(null);
@@ -72,6 +73,34 @@ export default function ProfilePage()
     }, [user, userID]);
 
 
+    const changeUsername = async (newUsername) => {
+        if(!newUsername || !userID) return;
+        const token = await user.getIdToken();
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/username`, {
+                method: "PUT",
+                headers: {"Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    newUsername,
+                })
+            });
+            if (res.ok) {
+                    toast.success("Username Updated", {
+                        autoClose: 500,
+                        onClose: () => navigate("/"),
+                    });
+                } else {
+                    const errorData = await res.json();
+                    toast.error("Failed to update username", errorData);
+                }
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to update username", error);
+        }
+    }
+
     const handleImageUpload = async () => {
         if(!selectedImage || !userID) return;
         
@@ -115,6 +144,8 @@ export default function ProfilePage()
         const triggerFileInput = () => {
             fileInputRef.current?.click();
         };
+
+    
     if(!userData) return (
         <>
         <Dashboard/>
