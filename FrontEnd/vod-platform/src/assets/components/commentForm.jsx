@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {auth} from "/src/firebaseAuth.js";
 export default function CommentSection({ vod, canComment, uploaderName, uploaderIMG, variant = "card", }) {
@@ -48,9 +48,6 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
       fetchUserRole();
   }, [userID, user]);
 
-  useEffect(() => {
-    fetchComments();
-  }, [vod.vod_id]);
 
   const handleTimeUpdate = () => {
     if (videoRef) {
@@ -80,28 +77,45 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
     }
   }
 
-  const handleSubmitComment = async () => {
-    
-    if (!commentText.trim()) return;
-    
-    const profanity = await profanityCheck(commentText);
+  const fetchComments = useCallback(async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/vod_comments/${vod.vod_id}`);
+      const data = await res.json();
+      setComments(data);
+    } catch (err) {
+      console.error(`Error fetching comments for VOD`, err);
+    }
+  }, [vod.vod_id]);
 
-    if (profanity.isProfanity) {
-      alert('Your comment contains inappropriate language. Please revise and try again.');
-      return;
-    } 
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
+
+  const handleSubmitComment = useCallback(async () => {
+  if (!commentText.trim()) return;
+  
+  console.log('Current commentText:', `"${commentText}"`);
+  
+  const profanity = await profanityCheck(commentText.trim());
+
+  if (profanity.isProfanity) {
+    alert('Your comment contains inappropriate language. Please revise and try again.');
+    return;
+  } 
 
     try {
       console.log(userID)
+      const token = await user.getIdToken();
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/vod_comments`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+         },
         body: JSON.stringify({
           vod_id: vod.vod_id,
           timestamp_seconds: currentTime,
           comments: commentText,
           created_at: new Date().toISOString(),
-          user_id: userID,
         }),
       });
 
@@ -115,17 +129,21 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
     } catch (error) {
       console.error("Failed to submit comment:", error);
     }
-  };
+  }, [commentText, currentTime, vod.vod_id, userID, user, fetchComments]);
 
-  const fetchComments = async () => {
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/vod_comments/${vod.vod_id}`);
-      const data = await res.json();
-      setComments(data);
-    } catch (err) {
-      console.error(`Error fetching comments for VOD`, err);
-    }
-  };
+  // const fetchLikes = async (comment_id) => {
+  //   try {
+  //     const res = await fetch(`${import.meta.env.VITE_API_URL}/api/getCommentLikes/${comment_id}`)
+  //     if (!res.ok) {
+  //     throw new Error(`HTTP error ${res.status}`)
+  //     }
+  //     const data = await res.json();
+  //     return data.likeCount; 
+  //   } catch (error) {
+  //   console.error("Error fetching likes:", error);
+  //   return 0;
+  // }
+// } 
 
   return (
     <div className={`bg-[#1a1a1a] text-white rounded-md p-4 shadow-lg flex flex-col gap-4  ${variant === "page"
@@ -180,6 +198,7 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
                   
                 </div>
                  <p>{c.comments}</p>
+                 <p>{c.likeCount}</p>
                 <p className="text-green-400 cursor-pointer hover:underline" onClick={() => seekTime(c.timestamp_seconds)}>{formatTimestamp(c.timestamp_seconds)} </p>
               </div>
             ))
@@ -227,5 +246,3 @@ function formatTimestamp(seconds) {
     ? `${hrs}:${paddedMins}:${paddedSecs}`
     : `${paddedMins}:${paddedSecs}`;
 }
-
-

@@ -142,7 +142,8 @@ useEffect(() => {
       alert("Please select a video file and login");
       return;
     }
-    const token = await user.getIDToken();
+    // const user = auth.currentUser();
+    const token = await user.getIdToken();
     if (!ffmpegLoaded) {
       setError("Video processor not ready. Please wait and try again.");
       return;

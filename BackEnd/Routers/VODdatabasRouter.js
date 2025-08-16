@@ -159,5 +159,64 @@ router.put("/user/role", verifyFirebaseToken, async (req, res) => {
   res.status(200).json(data);
 })
 
+router.get("/getCommentLikes/:comment_id", verifyFirebaseToken, async(req,res) => {
+  const {comment_id} = req.params;
+  try {
+  const {count, error} = await supabase
+  .from("comment_likes")
+  .select('*', {count: 'exact'})
+  .eq('comment_id', comment_id);
+  if (error) {
+    console.error("Error getting likes:", error);
+    return res.status(500).json({ error: error.message });
+  }
+  return res.status(200).json({likeCount: count});
+  } catch (error) {
+    console.error("Error getting likes:", error);
+    return res.status(500).json({Error: "Error getting likes"});
+  }
+})
+
+router.post("/commentAdd/:comment_id", verifyFirebaseToken, async(req, res) => {
+  const firebase_id = req.uid;
+  const { comment_id } = req.params;
+  const { data: userData, error: userError } = await supabase
+  .from("user_data")
+  .select("id")
+  .eq("firebase_id", firebase_id)
+  .single();
+
+  if (userError || !userData) {
+    console.error("Could not find user UUID:", userError);
+    return res.status(400).json({ error: "User not found" });
+  }
+
+  const uuid = userData.id;
+  try {
+    const {data, error} = await supabase
+    .from("comment_likes")
+    .insert([{comment_id: comment_id, user_id: uuid}])
+    if(error) {
+      if(error.code === '23505') {
+        await supabase
+        .from("comment_likes")
+        .delete()
+        .eq('comment_id', comment_id)
+        .eq('user_id', uuid);
+      } else {
+        console.error("Could not delete like:", error);
+      }
+    }
+  } catch (error) {
+    console.error("Error deleting like: ", error);
+    return res.status(500).json({error: "Failed to delete or add comment."});
+  }
+  const {count} = await supabase
+  .from("comment_likes")
+  .select('*', {count: 'exact'})
+  .eq('comment_id', comment_id);
+  return res.status(200).json({likeCount: count});
+})
+
 
 module.exports = router;
