@@ -37,7 +37,7 @@ router.get("/vod_comments/:vodID", async (req, res) => {
     const {data, error} = await supabase
     .from("vod_comments")
     .select(`*, user_data(username, profile_img_url),
-        comment_likes!(id)`
+        comment_likes!inner(id)`
     )
     .eq("vod_id", vodID)
     .order("timestamp_seconds", {ascending:true})
