@@ -15,7 +15,7 @@ export default function Dashboard() {
   const [userID, setUserID] = useState(null);
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate()
-  const auth = getAuth()
+  // const auth = getAuth()
   const isLoggedIn = Boolean(userID);
 
 
@@ -42,9 +42,9 @@ const unsubscribe = auth.onAuthStateChanged((user) => {
             try {
             const user = auth.currentUser;
             if (!user) return;
-    
+            console.log(user.uid);
             const token = await user.getIdToken();
-    
+              
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user`, {
                 headers: {
                 "Authorization": `Bearer ${token}`,
