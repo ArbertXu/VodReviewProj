@@ -36,16 +36,20 @@ router.get("/vod_comments/:vodID", async (req, res) => {
     const { vodID } = req.params;
     const {data, error} = await supabase
     .from("vod_comments")
-    .select(`*, user_data(username, profile_img_url)`)
+    .select(`*, user_data(username, profile_img_url),
+        comment_likes!(id)`
+    )
     .eq("vod_id", vodID)
     .order("timestamp_seconds", {ascending:true})
     if (error) {
         console.error("error getting comments", error)
         return res.status(500).send("Error retrieving comments");
     }
-    res.json(data);
+    const commentWithLikes = data.map(comment => ({
+        ...comment,
+        likeCount: comment.comment_likes ? comment.comment_likes.length : 0
+    }))
+    res.json(commentWithLikes);
 });
-
-
 
 module.exports = router
