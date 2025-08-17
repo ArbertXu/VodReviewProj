@@ -9,6 +9,7 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
   const [userID, setUserID] = useState(null);
   const [isCoach, setIsCoach] = useState(false);
   const [user, setUser] = useState(false);
+  const [showAddComment, setShowAddComment] = useState(false);
   useEffect(() => {
     const storedUserID = sessionStorage.getItem("user_id");
     if (storedUserID) {
@@ -131,19 +132,6 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
     }
   }, [commentText, currentTime, vod.vod_id, userID, user, fetchComments]);
 
-  // const fetchLikes = async (comment_id) => {
-  //   try {
-  //     const res = await fetch(`${import.meta.env.VITE_API_URL}/api/getCommentLikes/${comment_id}`)
-  //     if (!res.ok) {
-  //     throw new Error(`HTTP error ${res.status}`)
-  //     }
-  //     const data = await res.json();
-  //     return data.likeCount; 
-  //   } catch (error) {
-  //   console.error("Error fetching likes:", error);
-  //   return 0;
-  // }
-// } 
 
   return (
     <div className={`bg-[#1a1a1a] text-white rounded-md p-4 shadow-lg flex flex-col gap-4  ${variant === "page"
@@ -181,10 +169,38 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
       </div>
       <div className="mt-2 flex flex-col flex-grow">
         <p className="font-semibold mb-1 text-xs">Comments:</p>
+        {showAddComment && canComment && (
+          <div className="mt-2">
+            <p className="italic text-gray-400 mb-1">At: {formatTimestamp(currentTime)}</p>
+            <textarea
+              className="w-full p-1 text-xs rounded bg-black border border-gray-600"
+              rows={2}
+              placeholder="Add comment..."
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+            />
+            <button
+              className={`mt-1 w-full px-2 py-1 rounded text-xs transition duration-200 mb-5 ${
+                isCoach
+                  ? "bg-teal-600 hover:bg-teal-700"
+                  : "bg-gray-500 opacity-50 cursor-not-allowed"
+              }`}
+              disabled={!isCoach}
+              onClick={handleSubmitComment}
+            >
+              Submit
+            </button>
+          </div>
+        )}
+        <button className={`mb-2 px-2 py-1 w-50  text-white text-xs mx-auto rounded transitionduration-200 ${showAddComment ? "bg-red-600 hover:bg-red-700" : "rounded bg-teal-600 hover:bg-teal-700"}`}
+        onClick={() => setShowAddComment(!showAddComment)}>
+           {showAddComment ? "Cancel" : "add comment"}
+        </button>
+        
         <div className={`space-y-2 ${variant === "page" ? "" : " h-15 max-h-15 overflow-y-auto"}`}>
           {comments.length > 0 ? (
             comments.map((c, i) => (
-              <div key={i} className="bg-gray-800 p-1 rounded">
+              <div key={i} className="bg-gray-800 p-1 rounded w-full">
                 <div className="flex flex-row items-center justify-center">
                   {c.user_data?.profile_img_url && (
                     <img 
@@ -207,29 +223,7 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
           )}
         </div>
 
-        {canComment && (
-          <div className="mt-2">
-            <p className="italic text-gray-400 mb-1">At: {formatTimestamp(currentTime)}</p>
-            <textarea
-              className="w-full p-1 text-xs rounded bg-black border border-gray-600"
-              rows={2}
-              placeholder="Add comment..."
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-            />
-            <button
-              className={`mt-1 w-full px-2 py-1 rounded text-xs transition duration-200 ${
-                isCoach
-                  ? "bg-teal-600 hover:bg-teal-700"
-                  : "bg-gray-500 opacity-50 cursor-not-allowed"
-              }`}
-              disabled={!isCoach}
-              onClick={handleSubmitComment}
-            >
-              Submit
-            </button>
-          </div>
-        )}
+        
       </div>
     </div>
   );
