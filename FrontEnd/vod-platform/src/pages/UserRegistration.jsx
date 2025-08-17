@@ -5,18 +5,31 @@ import { ToastContainer, toast } from 'react-toastify';
 import { auth, signInWithEmailAndPassword } from "../firebaseAuth";
 function UserRegistration() {
     const navigate = useNavigate();
-    const[formData, setFormData] = useState({
+    const [formData, setFormData] = useState({
         username: "",
         email: "",
         password: "",
         role: "user",
     });
+
+    // for viewing password on entry
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState("");
+
     const handleChange = (e) => {
         setFormData({...formData, [e.target.name]: e.target.value})
     }
     const handleSubmit = async (e) => {
         console.log("Submitting form:", formData);
         e.preventDefault();
+
+        setError(""); // Clear any previous error
+        if (formData.password !== confirmPassword) {
+            setError("Passwords do not match");
+            return;
+        }
+
         try {
             console.log("VITE_API_URL:", import.meta.env.VITE_API_URL);
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/register`, {
@@ -64,13 +77,41 @@ function UserRegistration() {
                 className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1 transition duration-300"
                 onChange={handleChange}
                 />
-                <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1 transition duration-300"
-                onChange={handleChange}
-                />
+                <div className="relative">
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        placeholder="Password"
+                        className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1 pr-10 transition duration-300"
+                        onChange={handleChange}
+                    />
+                    <span
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-2 flex items-center cursor-pointer text-gray-400"
+                    >
+                        {showPassword ? "🙈" : "👁️"}
+                    </span>
+                </div>
+
+                <div className="relative">
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        name="confirmPassword"
+                        placeholder="Confirm Password"
+                        className="input input-bordered w-full border-gray-500 focus:bg-gray-800 border p-1 pr-10 transition duration-300"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                    <span
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-2 flex items-center cursor-pointer text-gray-400"
+                    >
+                        {showPassword ? "🙈" : "👁️"}
+                    </span>
+                </div>
+
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+
                 <input
                 type="checkbox"
                 id="coachCheckbox"
