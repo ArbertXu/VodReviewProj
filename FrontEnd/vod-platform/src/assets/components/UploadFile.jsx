@@ -26,18 +26,18 @@ export default function UploadForm({ onSubmit, uploading, onFileChange}) {
   <button
     type="button"
     onClick={() => fileInputRef.current?.click()}
-    className="w-full bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg transition duration-200 text-sm font-medium"
+    className="w-full bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 rounded-lg transition duration-200 text-sm font-medium"
   >
     {filename ? ` Selected: ${filename}` : " Choose Video File"}
   </button>
 
   <button
     type="submit"
-    disabled={uploading}
+    disabled={uploading || !filename}
     className={`w-full ${
-      uploading
-        ? "bg-teal-400 cursor-not-allowed"
-        : "bg-teal-600 hover:bg-teal-700"
+      uploading || !filename
+        ? "bg-gray-800 cursor-not-allowed"
+        : "bg-gray-700 hover:bg-gray-600"
     } text-white py-2 px-4 rounded-lg transition duration-200 text-sm font-semibold`}
   >
     {uploading ? "Uploading..." : " Upload VOD"}
