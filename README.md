@@ -1,20 +1,3 @@
 # VodReviewProj
 vod review website 
-For cloning:
-https://github.com/ArbertXu/VodReviewProj.git
-npm install 
-create .env
-VITE_AWS_REGION = 
-VITE_S3_BUCKET =  
-VITE_API_URL=
 
-
-VITE_FIREBASE_API_KEY =
-VITE_FIREBASE_AUTH_DOMAIN = 
-VITE_FIREBASE_PROJECT_ID  = 
-VITE_FIREBASE_STORAGE_BUCKET = 
-VITE_FIREBASE_MESSAGING_SENDER_ID =
-VITE_FIREBASE_APP_ID = 
-VITE_FIREBASE_MEASURMENT_ID = 
-VITE_FFMPEG_CORE_URL= 
-npm run dev
