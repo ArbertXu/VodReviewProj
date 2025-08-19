@@ -124,11 +124,8 @@ router.put("/user/username", verifyFirebaseToken, async(req, res) => {
   const user_id = req.uid;
   try {
     const {newUserName} = req.body;
-    await admin.auth().updateUser(uid, {
-      password: newPassword,
-    })
 
-    const {data, error} = await supabase.from("user_data").update({newUserName})
+    const {data, error} = await supabase.from("user_data").update({username: newUserName})
     .eq("firebase_id", user_id)
     .select()
     .single();
@@ -138,6 +135,7 @@ router.put("/user/username", verifyFirebaseToken, async(req, res) => {
     }
     return res.status(200).json(data)
   } catch (error) {
+    console.error("Error updating":, error);
     return res.status(500).json({error: "Failed to update username"});
   }
 })
