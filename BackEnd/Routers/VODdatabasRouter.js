@@ -135,7 +135,7 @@ router.put("/user/username", verifyFirebaseToken, async(req, res) => {
     }
     return res.status(200).json(data)
   } catch (error) {
-    console.error("Error updating":, error);
+    console.error("Error updating:", error);
     return res.status(500).json({error: "Failed to update username"});
   }
 })
