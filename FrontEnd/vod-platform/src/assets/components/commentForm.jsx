@@ -260,16 +260,17 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
                 <div className="flex justify-center items-center mb-1">
                     <button onClick= {() => handleLike(c.id)}>
                       <svg
-                        width="24"
-                        height="24"
+                        width="20"
+                        height="20"
                         viewBox="0 0 24 24"
                         fill={c.liked ? "red" : "white"}
+                        className="transition-colors duration-300 ease-in-out"
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                       </svg>
                       </button> 
-                    <p>{c.likeCount}</p>
+                    <p className="text-xs p-1">{c.likeCount}</p>
                   </div>
               </div>
             ))
