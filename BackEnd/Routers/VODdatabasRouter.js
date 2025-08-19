@@ -124,11 +124,8 @@ router.put("/user/username", verifyFirebaseToken, async(req, res) => {
   const user_id = req.uid;
   try {
     const {newUserName} = req.body;
-    await admin.auth().updateUser(uid, {
-      password: newPassword,
-    })
 
-    const {data, error} = await supabase.from("user_data").update({newUserName})
+    const {data, error} = await supabase.from("user_data").update({username: newUserName})
     .eq("firebase_id", user_id)
     .select()
     .single();
@@ -138,6 +135,7 @@ router.put("/user/username", verifyFirebaseToken, async(req, res) => {
     }
     return res.status(200).json(data)
   } catch (error) {
+    console.error("Error updating:", error);
     return res.status(500).json({error: "Failed to update username"});
   }
 })
@@ -159,21 +157,51 @@ router.put("/user/role", verifyFirebaseToken, async (req, res) => {
   res.status(200).json(data);
 })
 
-router.get("/getCommentLikes/:comment_id", verifyFirebaseToken, async(req,res) => {
-  const {comment_id} = req.params;
-  try {
-  const {count, error} = await supabase
-  .from("comment_likes")
-  .select('*', {count: 'exact'})
-  .eq('comment_id', comment_id);
-  if (error) {
-    console.error("Error getting likes:", error);
-    return res.status(500).json({ error: error.message });
+// router.get("/getCommentLikes/:comment_id", verifyFirebaseToken, async(req,res) => {
+//   const {comment_id} = req.params;
+//   try {
+//   const {count, error} = await supabase
+//   .from("comment_likes")
+//   .select('*', {count: 'exact'})
+//   .eq('comment_id', comment_id);
+//   if (error) {
+//     console.error("Error getting likes:", error);
+//     return res.status(500).json({ error: error.message });
+//   }
+//   return res.status(200).json({likeCount: count});
+//   } catch (error) {
+//     console.error("Error getting likes:", error);
+//     return res.status(500).json({Error: "Error getting likes"});
+//   }
+// })
+
+router.get("/user_comment_likes", verifyFirebaseToken, async(req, res) => {
+  const firebase_id = req.uid;
+  const { data: userData, error: userError } = await supabase
+  .from("user_data")
+  .select("id")
+  .eq("firebase_id", firebase_id)
+  .single();
+
+  if (userError || !userData) {
+    console.error("Could not find user UUID:", userError);
+    return res.status(400).json({ error: "User not found" });
   }
-  return res.status(200).json({likeCount: count});
+
+  const uuid = userData.id;
+
+  try {
+    const {data, error} = await supabase
+    .from("comment_likes")
+    .select("comment_id")
+    .eq("user_id", uuid)
+
+    if(error) throw error;
+    const likedCommentsID = data.map(item => item.comment_id);
+    return res.json(likedCommentsID);
   } catch (error) {
-    console.error("Error getting likes:", error);
-    return res.status(500).json({Error: "Error getting likes"});
+    console.error("Error fetching liked comments.", error);
+    return res.status(500).json({ error: "Failed to fetch liked comments" });
   }
 })
 
