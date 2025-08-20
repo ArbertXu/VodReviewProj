@@ -1,29 +1,47 @@
 import React, { useState, useEffect } from "react";
-import {getAuth, sendPasswordResetEmail, confirmPasswordReset} from "firebase/auth";
+import {getAuth, sendPasswordResetEmail, confirmPasswordReset, applyActionCode} from "firebase/auth";
 import {auth} from "../firebaseAuth";
 import { useNavigate, useLocation } from "react-router-dom";
 import Dashboard from "../assets/components/dashboard";
 import { ToastContainer, toast } from 'react-toastify'; 
 
-export default function ResetPassword() {
+export default function AuthActionHandler() {
 
     const navigate = useNavigate();
     const location = useLocation();
     const [oobCode, setoobCode] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [loading, setLoading] = useState(false);
-
+    const [mode, setMode] = useState(null);
     useEffect (() => {
         const params = new URLSearchParams(location.search);
+        const modeParam = params.get("mode");
         const code = params.get("oobCode");
-        if(!code) {
+        if(!code || !modeParam) {
             toast.error("Invalid reset code.", {
                 autoClose: 1000,
-                onClose: () => navigate("/login/user"),
+                onClose: () => navigate("/"),
             })
             return;
         }
         setoobCode(code);
+        setMode(modeParam)
+
+        if (modeParam === "verifyEmail") {
+            applyActionCode(auth, code)
+            .then(() => {
+                toast.success("Email Verified! You can now log in!", {
+                    autoClose: 1000,
+                    onClose: () => navigate("/login/user"),
+                });
+            })
+            .catch(() => {
+                toast.error("Verification link invalid or expired.", {
+                    autoClose: 1000,
+                    onClose: () => navigate("/")
+                })
+            })
+        }
     }, [location, navigate]);
 
     const handleSubmit = async (e) => {
@@ -53,7 +71,8 @@ export default function ResetPassword() {
         <>
         <Dashboard/>
     <div className="flex justify-center items-center min-h-screen">
-      <form
+        {mode === "resetPassword" ? (
+            <form
         onSubmit={handleSubmit}
         className="card shadow-xl p-6 space-y-4 bg-gray-800 text-white w-full max-w-sm"
       >
@@ -73,6 +92,10 @@ export default function ResetPassword() {
           {loading ? "Updating..." : "Reset Password"}
         </button>
       </form>
+        ) : (
+            <p className="text-white">Processing Request</p>
+        )} 
+      
     </div>
     </>
     )

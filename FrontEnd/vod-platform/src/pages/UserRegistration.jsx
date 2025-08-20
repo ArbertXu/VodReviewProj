@@ -39,8 +39,14 @@ function UserRegistration() {
             })
             const data = await response.json();
             if (response.ok) {
-                await signInWithEmailAndPassword(auth, formData.email, formData.password)
-                toast.success("Registered successfully and logged in!", {
+                const userCredential = await createUserWithEmailAndPassword(
+                    auth,
+                    formData.email,
+                    formData.password
+                )
+                await sendEmailVerification(userCredential.user);
+                // await signInWithEmailAndPassword(auth, formData.email, formData.password)
+                toast.success("Registered successfully! Please check your email for a verification link!", {
                         autoClose: 2000,
                         onClose: () => navigate("/"),
                       });
