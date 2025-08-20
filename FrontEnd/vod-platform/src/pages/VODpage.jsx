@@ -235,6 +235,7 @@ useEffect(() => {
         const newVod = await metadataRes.json();
         setVods((prev) => [...prev, newVod]);
         setFile(null);
+        toast.success("Video successfully uploaded!")
       } catch (err) {
         console.error("Error uploading:", err);
       } finally {

@@ -1,8 +1,17 @@
 import React from "react";
+import {useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Dashboard from "../assets/components/dashboard";
+import {auth} from "/src/firebaseAuth.js";
 function Home() {
     const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+    useEffect(() => {
+            const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+                setUser(firebaseUser);
+            })
+            return () => unsubscribe();
+        }, []);
      return (
     <>
       <Dashboard />
@@ -19,10 +28,19 @@ function Home() {
           and get your VODs reviewed.
         </p>
         <div className="flex space-x-4">
-          <button className="bg-teal-600 px-6 py-2 rounded hover:bg-teal-700 transition duration-200 text-white"
-            onClick={() => navigate("/registration/user")}>
-            Sign Up
-          </button>
+            {!user && (
+                <>
+                <button className="bg-teal-600 px-6 py-2 rounded hover:bg-teal-700 transition duration-200 text-white"
+                    onClick={() => 
+                        navigate("/registration/user")}>
+                    Register
+                </button>
+                <button className="bg-teal-600 px-6 py-2 rounded hover:bg-teal-700 transition duration-200 text-white"
+                    onClick={() => navigate("/login/user")}>
+                        Login
+                    </button>
+                    </>
+            ) }
           <button className="bg-gray-700 px-6 py-2 rounded hover:bg-gray-800 transition duration-200 text-white"
           onClick={() => navigate("/explore")}>
             Browse VODs
@@ -78,10 +96,17 @@ function Home() {
         <p className="text-white mb-6 max-w-xl mx-auto">
           Join our community and start uploading or reviewing VODs today!
         </p>
+        {user? <button className="bg-teal-600 px-8 py-3 rounded hover:bg-teal-700 transition duration-200 text-white"
+        onClick={() => navigate("/explore/")}>
+          Browse VODS
+        </button>
+        :
         <button className="bg-teal-600 px-8 py-3 rounded hover:bg-teal-700 transition duration-200 text-white"
         onClick={() => navigate("/registration/user")}>
           Sign Up Now
         </button>
+        }
+       
       </section>
 
       {/* Footer */}
