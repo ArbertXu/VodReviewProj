@@ -12,10 +12,19 @@ async function getLeagueRank(riotID, tagLine) {
     })
     const accountData = await res.json();
     const puuid = accountData.puuid;
+    if(!puuid) {
+        console.error("NOT PUUID");
+        return 0;
+    }
     const rankRes = await fetch(`https://na1.api.riotgames.com/lol/league/v4/entries/by-puuid/${puuid}`, {
         headers: {"X-Riot-Token": process.env.RIOT_API_KEY}
     })
     const rankData = await rankRes.json();
+    console.log(rankData);
+    if (!Array.isArray(rankData)) {
+    console.error("Unexpected rankData:", rankData);
+    return 0;
+}
     const soloQueue = rankData.find(entry => entry.queueType === "RANKED_SOLO_5x5");
     return soloQueue ? `${soloQueue.tier} ${soloQueue.rank}` : 0;   
 }
