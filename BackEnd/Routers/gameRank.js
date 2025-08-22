@@ -20,7 +20,7 @@ async function getLeagueRank(riotID, tagLine) {
     const doubleLIft = await testRes.json();
     console.log("DOUBLELIFT", doubleLIft);
     const res = await fetch(`https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${riotID}/${tagLine}`, {
-        headers: {"X-Riot-Token": process.env.RIOT_API_KEY}
+        headers: {"X-Riot-Token": process.env.TEMP_RIOT_KEY}
     })
     const accountData = await res.json();
     console.log("Account response:", accountData);
