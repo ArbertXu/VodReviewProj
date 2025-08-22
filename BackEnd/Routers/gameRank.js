@@ -65,7 +65,7 @@ router.post("/apply-coach", verifyFirebaseToken, async(req, res) => {
         })
         .eq("firebase_id", user_id)
         .select();
-        if (userError) throw error;
+        if (userError) throw userError;
         res.json({rank, eligible, updatedUser: userData[0]});
     } catch (err) {
         console.error(err)
