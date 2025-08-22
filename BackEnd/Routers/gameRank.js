@@ -34,7 +34,7 @@ async function getLeagueRank(riotID, tagLine) {
         return 0;
     }
     const rankRes = await fetch(`https://na1.api.riotgames.com/lol/league/v4/entries/by-puuid/${puuid}`, {
-        headers: {"X-Riot-Token": process.env.RIOT_API_KEY}
+        headers: {"X-Riot-Token": process.env.TEMP_API_KEY}
     })
     const rankData = await rankRes.json();
     console.log(rankData);
