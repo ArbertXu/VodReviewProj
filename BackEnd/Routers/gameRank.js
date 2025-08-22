@@ -7,7 +7,7 @@ const RIOT_API_KEY = process.env.TEMP_RIOT_KEY;
 const fetch = require("node-fetch");
 
 async function getLeagueRank(riotID, tagLine) {
-    const res = await fetch(`https://na1.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${riotID}/${tagLine}`, {
+    const res = await fetch(`https://na1.api.riotgames.com/riot/account/v1/accounts/by-riot-id/lol/${riotID}/${tagLine}`, {
         headers: {"X-Riot-Token": process.env.RIOT_API_KEY}
     })
     const accountData = await res.json();
