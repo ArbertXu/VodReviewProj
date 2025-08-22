@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const verifyFirebaseToken = require("./authmiddleware.js");
-const canBeCoach = require("../rankHelper")
+const { canBeCoach } = require("../rankHelper")
 const supabase = require("../database")
 const RIOT_API_KEY = process.env.TEMP_RIOT_KEY;
 const fetch = require("node-fetch");
