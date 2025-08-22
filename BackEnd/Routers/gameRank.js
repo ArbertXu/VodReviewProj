@@ -7,11 +7,22 @@ const RIOT_API_KEY = process.env.TEMP_RIOT_KEY;
 const fetch = require("node-fetch");
 
 async function getLeagueRank(riotID, tagLine) {
+
+
+    const apiKey = process.env.RIOT_API_KEY;
+    console.log('API Key length:', apiKey?.length);
+    console.log('API Key starts with RGAPI-:', apiKey?.startsWith('RGAPI-'));
+    console.log('API Key first 15 chars:', apiKey?.substring(0, 15));
+  
     const res = await fetch(`https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${riotID}/${tagLine}`, {
         headers: {"X-Riot-Token": process.env.RIOT_API_KEY}
     })
     const accountData = await res.json();
     console.log("Account response:", accountData);
+    if (!res.ok || accountData.status) {
+        console.error("API Error:", accountData);
+        return null; // or throw an error
+    }   
     const puuid = accountData.puuid;
     if(!puuid) {
         console.error("NOT PUUID");
