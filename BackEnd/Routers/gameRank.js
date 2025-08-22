@@ -11,6 +11,7 @@ async function getLeagueRank(riotID, tagLine) {
         headers: {"X-Riot-Token": process.env.RIOT_API_KEY}
     })
     const accountData = await res.json();
+    console.log("Account response:", accountData);
     const puuid = accountData.puuid;
     if(!puuid) {
         console.error("NOT PUUID");
