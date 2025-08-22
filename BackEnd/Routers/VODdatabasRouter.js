@@ -78,7 +78,7 @@ router.get("/vods/id/:vod_id", async (req, res) => {
 })
 
 router.post("/vods", verifyFirebaseToken, async (req, res) => {
-  const { url, date_uploaded, s3_key } = req.body;
+  const { url, date_uploaded, s3_key, game } = req.body;
   const { data: userData, error: userError } = await supabase
   .from("user_data")
   .select("id")
@@ -94,7 +94,7 @@ router.post("/vods", verifyFirebaseToken, async (req, res) => {
 
   const {data, error } = await supabase
   .from("vods")
-  .insert([{url, user_id: uuid, date_uploaded, s3_key}])
+  .insert([{url, user_id: uuid, date_uploaded, s3_key, Game: game}])
   .select()
   .single();
   if(error) {

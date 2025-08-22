@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 export default function VodPost() {
     const {vod_id} = useParams();
     const [Vod, setVod] = useState(null);
+    const [game, setGame] = useState("");
 
     useEffect(() => {
         fetch(`${import.meta.env.VITE_API_URL}/api/vods/id/${vod_id}`)

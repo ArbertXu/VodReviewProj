@@ -11,11 +11,13 @@ const protectedRoute = require("./Routers/loginRouter")
 const authRouter = require("./Routers/router");
 const vodRouter = require("./Routers/VODdatabasRouter");
 const CommentRouter = require("./Routers/notesRouter");
+const gameRankRouter = require("./Routers/gameRank");
 app.use("/api", authRouter);
 app.use("/api", protectedRoute)
 app.use("/api", vodRouter)
 app.use("/api", s3UploadRoutes);
 app.use("/api", CommentRouter);
+app.use("/api", gameRankRouter)
 app.get("/", (req, res) => {
   res.send("Backend is running!");
 });
