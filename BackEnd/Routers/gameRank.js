@@ -17,6 +17,8 @@ async function getLeagueRank(riotID, tagLine) {
     const testRes = await fetch('https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/Doublelift', {
         headers: {"X-Riot-Token": process.env.TEMP_RIOT_KEY}
     });
+    const doubleLIft = await testRes.json();
+    console.log("DOUBLELIFT", doubleLIft);
     const res = await fetch(`https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${riotID}/${tagLine}`, {
         headers: {"X-Riot-Token": process.env.RIOT_API_KEY}
     })
