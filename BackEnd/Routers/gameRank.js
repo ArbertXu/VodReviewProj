@@ -13,7 +13,10 @@ async function getLeagueRank(riotID, tagLine) {
     console.log('API Key length:', apiKey?.length);
     console.log('API Key starts with RGAPI-:', apiKey?.startsWith('RGAPI-'));
     console.log('API Key first 15 chars:', apiKey?.substring(0, 15));
-  
+    // Test with a different endpoint that uses summoner name
+    const testRes = await fetch('https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/Doublelift', {
+        headers: {"X-Riot-Token": process.env.TEMP_RIOT_KEY}
+    });
     const res = await fetch(`https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${riotID}/${tagLine}`, {
         headers: {"X-Riot-Token": process.env.RIOT_API_KEY}
     })
