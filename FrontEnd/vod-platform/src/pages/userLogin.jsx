@@ -22,6 +22,11 @@ function UserLogin() {
     try {
       console.log("Logging in with", formData.email, formData.password);
       const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      if(!userCredential.user.emailVerified) {
+        toast.error("Please verify your email before logging in. Check your spam folder if you cannot find the email.");
+        await auth.signOut();
+        return;
+      }
       const token = await userCredential.user.getIdToken(); 
 
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/protected`, {

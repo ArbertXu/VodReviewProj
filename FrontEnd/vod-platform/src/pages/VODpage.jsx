@@ -17,6 +17,7 @@ export default function VodTest() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState('');
   const ffmpegRef = useRef(null);
+  const [game, setGame] = useState("");
 
   const getProgressColor = (progress) => {
     if (progress < 30) return 'bg-red-100 border-red-400 text-red-700';
@@ -24,7 +25,9 @@ export default function VodTest() {
     return 'bg-green-100 border-green-400 text-green-700';
   };
 
-
+  const handleGameChange = (e) => {
+        setGame(e.target.value);
+    }
   useEffect(() => {
           const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
               setUser(firebaseUser);
@@ -142,7 +145,7 @@ useEffect(() => {
       alert("Please select a video file and login");
       return;
     }
-    // const user = auth.currentUser();
+    
     const token = await user.getIdToken();
     if (!ffmpegLoaded) {
       setError("Video processor not ready. Please wait and try again.");
@@ -229,6 +232,7 @@ useEffect(() => {
             url: publicURL,
             s3_key: fileKey,
             date_uploaded: new Date().toISOString(),
+            game: game,
           }),
         });
 
@@ -254,6 +258,7 @@ useEffect(() => {
         </div>
       )}
 
+
       {uploading && (
       <div className={`mb-4 p-3 border rounded transition-colors duration-500 ${getProgressColor(uploadProgress)}`}>
         <div className="flex justify-between items-center mb-2">
@@ -271,6 +276,22 @@ useEffect(() => {
         </div>
       </div>
     )}
+    <label htmlFor="game" className="block mb-2 text-lg  text-white">
+        Select game in VOD:
+      </label>
+      <select
+        id="game"
+        value={game}
+        onChange={handleGameChange}
+        className="w-full p-3 m-5 rounded-lg bg-gray-800 text-white shadow-md 
+                   focus:ring-2 focus:ring-teal-500 focus:outline-none 
+                   hover:bg-gray-700 transition duration-200"
+      >
+        <option value="">-- Choose game --</option>
+        <option value="lol">League of Legends</option>
+        <option value="dota2">Dota 2</option>
+        <option value="valorant">Valorant</option>
+      </select>
       <UploadForm
         buttonText="Submit VOD"
         fileLabel="Upload your match clip"

@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Dashboard from "../assets/components/dashboard";
 import { ToastContainer, toast } from 'react-toastify'; 
-import { auth, signInWithEmailAndPassword } from "../firebaseAuth";
+import { auth, signInWithEmailAndPassword, } from "../firebaseAuth";
+import {createUserWithEmailAndPassword, sendEmailVerification} from "firebase/auth"
 function UserRegistration() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -39,17 +40,15 @@ function UserRegistration() {
             })
             const data = await response.json();
             if (response.ok) {
-                const userCredential = await createUserWithEmailAndPassword(
-                    auth,
-                    formData.email,
-                    formData.password
-                )
-                await sendEmailVerification(userCredential.user);
-                // await signInWithEmailAndPassword(auth, formData.email, formData.password)
+                await signInWithEmailAndPassword(auth, formData.email, formData.password);
+                await sendEmailVerification(auth.currentUser, {
+                url: "https://vod-review-proj.vercel.app/reset-password",
+                handleCodeInApp: true
+                });
+                await auth.signOut();
                 toast.success("Registered successfully! Please check your email for a verification link!", {
-                        autoClose: 2000,
-                        onClose: () => navigate("/"),
-                      });
+                    autoClose: 2000, onClose: () => navigate("/"),
+                })
             } else {
                 toast.error("ERROR: " + data.error)
             }

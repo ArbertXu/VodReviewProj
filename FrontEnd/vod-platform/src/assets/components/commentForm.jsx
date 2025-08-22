@@ -10,13 +10,14 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
   const [isCoach, setIsCoach] = useState(false);
   const [user, setUser] = useState(null);
   const [showAddComment, setShowAddComment] = useState(false);
-  useEffect(() => {
-    const storedUserID = sessionStorage.getItem("user_id");
-    if (storedUserID) {
-      setUserID(storedUserID);
-    }
-  }, []);
-
+  const [coachablegames, setcoachablegames] = useState([]);
+  const game = vod.Game;
+    useEffect(() => {
+      const storedUserID = sessionStorage.getItem("user_id");
+      if (storedUserID) {
+        setUserID(storedUserID);
+      }
+    }, []);
 
 
   useEffect(() => {
@@ -43,6 +44,16 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
               if (data.role === "coach") {
                   setIsCoach(true);
               }
+              if (data.is_lol_coach) {
+                setcoachablegames(prev => [...prev, "lol"])
+              }
+              if (data.is_val_coach) {
+                setcoachablegames(prev => [...prev, "valorant"])
+              }
+              if (data.is_dota2_coach) {
+                setcoachablegames(prev => [...prev, "dota2"])
+              }
+
           } catch (err) {
               console.error("Failed to get data:", err);
           }
@@ -211,7 +222,7 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
       </div>
       <div className="mt-2 flex flex-col flex-grow">
         <p className="font-semibold mb-1 text-xs">Comments:</p>
-        {showAddComment && canComment && (
+        {showAddComment && canComment && coachablegames.includes(game) && (
           <div className="mt-2">
             <p className="italic text-gray-400 mb-1">At: {formatTimestamp(currentTime)}</p>
             <textarea
@@ -234,11 +245,13 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
             </button>
           </div>
         )}
-        <button className={`mb-2 px-2 py-1 w-50  text-white text-xs mx-auto rounded transitionduration-200 ${showAddComment ? "bg-red-600 hover:bg-red-700" : "rounded bg-teal-600 hover:bg-teal-700"}`}
+        <button className={`mb-2 px-2 py-1 w-50  text-white text-xs mx-auto rounded transitionduration-200 ${showAddComment ? "bg-red-600 hover:bg-red-700" : "rounded bg-teal-600 hover:bg-teal-700"}
+        ${coachablegames.includes(game)? "": "cursor-not-allowed bg-gray-500 opacity-50"}`
+        }
+        disabled={!coachablegames.includes(game)}
         onClick={() => setShowAddComment(!showAddComment)}>
-           {showAddComment ? "Cancel" : "add comment"}
+           {coachablegames.includes(game) ? showAddComment ? "Cancel" : "add comment" : "Rank not high enough to coach. Update rank in settings."}
         </button>
-        
         <div className={`space-y-2 ${variant === "page" ? "" : " h-15 max-h-15 overflow-y-auto"}`}>
           {comments.length > 0 ? (
             comments.map((c, i) => (
