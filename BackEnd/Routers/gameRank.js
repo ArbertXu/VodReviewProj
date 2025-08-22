@@ -9,7 +9,7 @@ const fetch = require("node-fetch");
 async function getLeagueRank(riotID, tagLine) {
 
 
-    const apiKey = process.env.RIOT_API_KEY;
+    const apiKey = process.env.TEMP_RIOT_KEY;
     console.log('API Key length:', apiKey?.length);
     console.log('API Key starts with RGAPI-:', apiKey?.startsWith('RGAPI-'));
     console.log('API Key first 15 chars:', apiKey?.substring(0, 15));
