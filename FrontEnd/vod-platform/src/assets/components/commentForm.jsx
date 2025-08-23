@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {auth} from "/src/firebaseAuth.js";
+import { ToastContainer, toast } from 'react-toastify'; 
 export default function CommentSection({ vod, canComment, uploaderName, uploaderIMG, variant = "card", }) {
   const [commentText, setCommentText] = useState("");
   const [currentTime, setCurrentTime] = useState(0);
@@ -91,23 +92,29 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
   }
 
   const fetchComments = useCallback(async () => {
-    if (!userID || !user) return;
     try {
-      
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/vod_comments/${vod.vod_id}`);
       const data = await res.json();
-      const token = await user.getIdToken();
-      const likeResult = await fetch(`${import.meta.env.VITE_API_URL}/api/user_comment_likes`, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        }
-      })
-      const likedComments = await likeResult.json();
-      const combined = data.map(c => ({
-        ...c,
-        liked: likedComments.includes(c.id),
-      }));
-      setComments(combined);
+      if(user) {
+        const token = await user.getIdToken();
+        const likeResult = await fetch(`${import.meta.env.VITE_API_URL}/api/user_comment_likes`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          }
+        })
+        const likedComments = await likeResult.json();
+        const combined = data.map(c => ({
+          ...c,
+          liked: likedComments.includes(c.id),
+        }));
+        setComments(combined);
+      } else {
+        const combined = data.map(c => ({
+          ...c,
+          liked: false,
+        }));
+        setComments(combined)
+      }
     } catch (err) {
       console.error(`Error fetching comments for VOD`, err);
     }
@@ -271,7 +278,13 @@ export default function CommentSection({ vod, canComment, uploaderName, uploader
                  <p className="mb-1">{c.comments}</p>
                 <p className="text-green-400 cursor-pointer hover:underline mb-1" onClick={() => seekTime(c.timestamp_seconds)}>{formatTimestamp(c.timestamp_seconds)} </p>
                 <div className="flex justify-center items-center mb-1">
-                    <button onClick= {() => handleLike(c.id)}>
+                    <button onClick= {() => {if (user) {
+                      handleLike(c.id)
+                    } else {
+                       toast.error("Please Log in to like" , {
+                        autoClose: 1000,
+                       })
+                    }}}>
                       <svg
                         width="20"
                         height="20"
