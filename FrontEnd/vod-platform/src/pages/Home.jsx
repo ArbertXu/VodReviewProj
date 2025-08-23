@@ -72,19 +72,19 @@ function Home() {
         <h2 className="text-3xl font-bold text-white text-center mb-10">User Roles</h2>
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 text-center">
           <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold text-teal-400 mb-2">Coaches</h3>
-            <ul className="text-white list-disc list-inside">
-              <li>Provide detailed reviews</li>
-              <li>Earn reputation points</li>
-              {/* <li>Access advanced filters and analytics</li> */}
-            </ul>
-          </div>
-          <div className="bg-gray-800 p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold text-teal-400 mb-2">Users</h3>
             <ul className="text-white list-disc list-inside">
               <li>Receive feedback on your gameplay</li>
               <li>Improve your skills and track progress</li>
               <li>Interact with the community</li>
+            </ul>
+          </div>
+          <div className="bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold text-teal-400 mb-2">Coaches</h3>
+            <ul className="text-white list-disc list-inside">
+              <li>Provide detailed reviews</li>
+              <li>Ability to comment on VODS</li>
+              {/* <li>Access advanced filters and analytics</li> */}
             </ul>
           </div>
         </div>
